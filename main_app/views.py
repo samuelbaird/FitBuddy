@@ -12,11 +12,15 @@ def home(request):
 def about(request):
   return render(request, 'about.html')
 
+
+@login_required
 def workouts_index(request):
   return render(request, 'workouts_index.html')
 
+@login_required
 def exercises_index(request):
   return render(request, 'exercises_index.html')
+
 
 def signup(request):
   error_message = ''
