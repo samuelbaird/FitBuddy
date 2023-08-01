@@ -18,3 +18,18 @@ class Profile(models.Model):
   
   def get_absolute_url(self):
       return reverse('profile_detail', kwargs={'pk': self.id})
+  
+
+class Exercise(models.Model):
+     name = models.CharField(max_length=100)
+     type = models.CharField(max_length=100)
+     muscle = models.CharField(max_length=100)
+     equipment = models.CharField(max_length=100)
+     difficulty = models.CharField(max_length=100)
+     instructions = models.CharField(max_length=200)
+
+     def __str__(self):
+        return f'{self.name} ({self.id})'
+
+     def get_absolute_url(self):
+        return reverse('detail', kwargs={'beer_id': self.id})

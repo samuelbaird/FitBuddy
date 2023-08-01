@@ -21,6 +21,9 @@ def workouts_index(request):
 def exercises_index(request):
   return render(request, 'exercises_index.html')
 
+@login_required
+def exercises_form(request):
+  return render(request, 'exercises_form.html')
 
 def signup(request):
   error_message = ''
