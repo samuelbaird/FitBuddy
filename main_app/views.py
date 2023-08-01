@@ -12,9 +12,11 @@ def home(request):
 def about(request):
   return render(request, 'about.html')
 
+@login_required
 def workouts(request):
   return render(request, 'workouts.html')
 
+@login_required
 def exercises(request):
   return render(request, 'exercises.html')
 
