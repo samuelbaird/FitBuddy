@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+# Initialize environment variables
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,14 +80,16 @@ WSGI_APPLICATION = 'fitbuddy.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fitbuddy',
-
-        'USER': 'fitbuddyuser',
-        'PASSWORD': '1234'
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'neondb',
+    'USER': 'samuelbaird',
+    'PASSWORD': 'njlW24dOQRVE',
+    'HOST': 'ep-misty-voice-42949159.us-west-2.aws.neon.tech',
+    'PORT': '5432',
+  }
 }
+SECRET_KEY= env('SECRET_KEY')
 
 
 # Password validation
