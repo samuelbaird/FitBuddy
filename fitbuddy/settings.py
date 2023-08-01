@@ -78,6 +78,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'fitbuddy',
+
         'USER': 'fitbuddyuser',
         'PASSWORD': '1234'
     }
