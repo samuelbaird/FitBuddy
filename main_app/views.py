@@ -21,6 +21,11 @@ def workouts_index(request):
 def exercises_index(request):
   return render(request, 'exercises_index.html')
 
+@login_required
+def profile(request):
+  profile = Profile.objects.get(user=request.user)
+  return render(request, 'profile.html', {'profile': profile})
+
 
 def signup(request):
   error_message = ''

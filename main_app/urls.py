@@ -7,4 +7,5 @@ urlpatterns = [
   path('workouts_index/', views.workouts_index, name='workouts_index'),
   path('exercises_index/', views.exercises_index, name='exercises_index'),
   path('accounts/signup/', views.signup, name='signup'),
+  path('profile/', views.profile, name='profile'),
 ]
