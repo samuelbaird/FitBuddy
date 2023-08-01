@@ -12,6 +12,12 @@ def home(request):
 def about(request):
   return render(request, 'about.html')
 
+def workouts(request):
+  return render(request, 'workouts.html')
+
+def exercises(request):
+  return render(request, 'exercises.html')
+
 def signup(request):
   error_message = ''
   if request.method == 'POST':
@@ -25,3 +31,4 @@ def signup(request):
   form = UserCreationForm()
   context = {'form': form, 'error_message': error_message}
   return render(request, 'registration/signup.html', context)
+
