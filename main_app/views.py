@@ -6,3 +6,9 @@ def home(request):
 
 def about(request):
   return render(request, 'about.html')
+
+def workouts(request):
+  return render(request, 'workouts.html')
+
+def exercises(request):
+  return render(request, 'exercises.html')
