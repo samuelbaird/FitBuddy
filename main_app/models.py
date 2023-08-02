@@ -36,10 +36,14 @@ def create_or_update_profile(sender, instance, created, **kwargs):
 
 class Exercise(models.Model):
      name = models.CharField(max_length=100)
-     type = models.CharField(max_length=100)
-     muscle = models.CharField(max_length=100)
+     force = models.CharField(max_length=100)
+     level = models.CharField(max_length=100)
+     mechanic = models.CharField(max_length=100)
      equipment = models.CharField(max_length=100)
-     difficulty = models.CharField(max_length=100)
+     primaryMuscles = models.CharField(max_length=100)
+     secondaryMuscles = models.CharField(max_length=100)
+     category = models.CharField(max_length=100)
+     images = models.CharField(max_length=100)
      instructions = models.CharField(max_length=200)
 
      def __str__(self):
