@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile
+from .forms import ExerciseForm
 import requests
 import json
 
@@ -48,6 +49,18 @@ def profile(request):
   profile = Profile.objects.get(user=request.user)
   return render(request, 'profile.html', {'profile': profile})
 
+@login_required
+def exercises_form(request):
+  if request.method == 'POST':
+    form = ExerciseForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return redirect('exercises_index')
+    else:
+      return render(request, 'exercises_form.html', {'form': form})
+  else:
+      form = ExerciseForm()
+      return render(request, 'exercises_form.html', {'form': form})
 
 def signup(request):
   error_message = ''

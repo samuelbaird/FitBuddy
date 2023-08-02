@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h4>Exercises create</h4>
+  <form method="POST" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn" value="New Exercise"/>
+  </form>
+{% endblock %}

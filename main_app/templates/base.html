@@ -12,11 +12,12 @@
   <header>
     <nav>
       <div class="nav-wrapper">
-        <a href="#!" class="brand-logo"
+        <a style="padding-left: 0.5%;" href="#!" class="brand-logo"
           ><i class="material-icons">cloud</i>Logo</a
         >
         <ul class="right hide-on-med-and-down">
           {% if user.is_authenticated %}
+          <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
           <li><a href="{% url 'profile' %}">Profile</a></li>
           <li><a href="{% url 'logout' %}">Log Out</a></li>
           {% else %}
