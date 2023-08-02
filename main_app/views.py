@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile
-from .forms import ExerciseForm
+from .forms import ExerciseForm, ProfileForm
 import requests
 import json
 
@@ -47,7 +48,20 @@ def exercises_index(request):
 @login_required
 def profile(request):
   profile = Profile.objects.get(user=request.user)
-  return render(request, 'profile.html', {'profile': profile})
+
+  height_display = profile.height
+  if profile.height_unit == 'ft':
+    height_display = profile.convert_height('ft')
+  weight_display = profile.weight
+  if profile.weight_unit == 'lbs':
+    weight_display = profile.convert_weight('lbs')
+
+  context = {
+    'profile': profile,
+    'height_display': height_display,
+    'weight_display': weight_display
+  }
+  return render(request, 'profile.html', context)
 
 @login_required
 def exercises_form(request):
@@ -78,7 +92,21 @@ def signup(request):
 
 class ProfileUpdate(UpdateView):
     model = Profile
-    fields = ['bio', 'age', 'height', 'weight']
+    form_class = ProfileForm
+    template_name = 'main_app/profile_form.html'
+    context_object_name = 'profile'
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        profile = form.save(commit=False)
+
+        if 'height_unit' in form.changed_data:
+            profile.height = profile.convert_height(profile.height_unit)
+        if 'weight_unit' in form.changed_data:
+            profile.weight = profile.convert_weight(profile.weight_unit)
+
+        profile.save()
+        return super().form_valid(form)
 
 class ProfileDelete(DeleteView):
     model = Profile
