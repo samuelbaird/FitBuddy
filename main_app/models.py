@@ -20,6 +20,10 @@ class Profile(models.Model):
 
     def get_absolute_url(self):
         return reverse('profile')
+    
+    def delete(self, *args, **kwargs):
+        self.user.delete()
+        super(Profile, self).delete(*args, **kwargs)
 
 
 @receiver(post_save, sender=User)
