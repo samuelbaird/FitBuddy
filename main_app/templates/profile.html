@@ -11,6 +11,10 @@
         <p>Height: {{ profile.height }}</p>
         <p>Weight: {{ profile.weight }}</p>
       </div>
+       <div class="card-action">
+        <a href="{% url 'profiles_update' profile.id %}">Edit</a>
+        <a href="{% url 'profiles_delete' profile.id %}">Delete</a>
+      </div>
     </div>
   </div>
 
