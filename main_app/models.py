@@ -19,7 +19,7 @@ class Profile(models.Model):
         return self.user.username
 
     def get_absolute_url(self):
-        return reverse('profile_detail', kwargs={'pk': self.id})
+        return reverse('profile')
 
 
 @receiver(post_save, sender=User)

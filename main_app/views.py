@@ -63,3 +63,10 @@ def signup(request):
   context = {'form': form, 'error_message': error_message}
   return render(request, 'registration/signup.html', context)
 
+class ProfileUpdate(UpdateView):
+    model = Profile
+    fields = ['bio', 'age', 'height', 'weight']
+
+class ProfileDelete(DeleteView):
+    model = Profile
+    success_url = '/'
