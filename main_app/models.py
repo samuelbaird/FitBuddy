@@ -99,3 +99,18 @@ class Exercise(models.Model):
 
      def get_absolute_url(self):
         return reverse('detail', kwargs={'exercise_id': self.id})
+
+class ImportedExercise(models.Model):
+     name = models.CharField(max_length=100, default='')
+     force = models.CharField(max_length=100, default='')
+     level = models.CharField(max_length=100, default='')
+     mechanic = models.CharField(max_length=100, default='')
+     equipment = models.CharField(max_length=100, default='')
+     primaryMuscles = models.CharField(max_length=100, default='')
+     secondaryMuscles = models.CharField(max_length=100, default='')
+     category = models.CharField(max_length=100, default='')
+     images = models.CharField(max_length=100, default='')
+     instructions = models.CharField(max_length=200, default='')
+
+     def __str__(self):
+        return f'{self.name} ({self.id})'
