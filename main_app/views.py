@@ -31,7 +31,7 @@ def exercises_index(request):
     except Exception as e:
       api = "Opps, There was an error"
       print(e)
-  return render(request, 'exercises_index.html', {'api': api})
+  return render(request, 'exercises/exercises_index.html', {'api': api})
   
 
 
