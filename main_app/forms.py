@@ -5,3 +5,4 @@ class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
         fields = '__all__'
+        exclude = ['user']
