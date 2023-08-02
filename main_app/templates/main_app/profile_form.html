@@ -9,9 +9,19 @@
 <form action="" method="POST">
     {% csrf_token %}
     <table>
-        {{ form.as_p }}
+        {{ form.as_table }}
     </table>
     <input type="submit" value="Submit" class="btn">
 </form>
+
+<script>  
+const selectWeight = document.getElementById("id_weight_unit");
+M.FormSelect.init(selectWeight);
+
+const selectHeight = document.getElementById("id_height_unit");
+M.FormSelect.init(selectHeight);
+
+
+</script>
 
 {% endblock %}

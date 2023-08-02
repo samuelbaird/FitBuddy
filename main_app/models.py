@@ -5,12 +5,12 @@ from datetime import date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-WEIGHT_UNIT_CHOICES = (
-    ( 'kg', 'Kilograms'),
+WEIGHT = (
+    ('kg', 'Kilograms'),
     ('lbs', 'Pounds'),
 )
 
-HEIGHT_UNIT_CHOICES = (
+HEIGHT = (
     ('cm', 'Centimeters'),
     ('ft', 'Feet'),
 )
@@ -24,15 +24,17 @@ class Profile(models.Model):
     
     height = models.IntegerField(blank=True, null=True)
     height_unit = models.CharField(
-        max_length=3,
-        choices=HEIGHT_UNIT_CHOICES,
-        default=HEIGHT_UNIT_CHOICES[0][0]
+        max_length=100,
+        blank=True,
+        choices=HEIGHT,
+        default=HEIGHT[0][0]
     )
     weight = models.IntegerField(blank=True, null=True)
     weight_unit = models.CharField(
-        max_length=3,
-        choices=WEIGHT_UNIT_CHOICES,
-        default=WEIGHT_UNIT_CHOICES[0][0]
+        max_length=100,
+        blank=True,
+        choices=WEIGHT,
+        default=WEIGHT[0][0]
     )
 
     def __str__(self):
@@ -45,30 +47,30 @@ class Profile(models.Model):
         self.user.delete()
         super(Profile, self).delete(*args, **kwargs)
 
-    def convert_weight(self, target_unit):
-        if self.weight_unit == target_unit:
-            return self.weight
+    # def convert_weight(self, target_unit):
+    #     if self.weight_unit == target_unit:
+    #         return self.weight
 
-        if self.weight_unit == WeightUnitChoices.KG and target_unit == WeightUnitChoices.LBS:
-            return self.weight * 2.20462
-        elif self.weight_unit == WeightUnitChoices.LBS and target_unit == WeightUnitChoices.KG:
-            return self.weight * 0.453592
-        else:
-            return self.weight
+    #     if self.weight_unit == WeightUnitChoices.KG and target_unit == WeightUnitChoices.LBS:
+    #         return self.weight * 2.20462
+    #     elif self.weight_unit == WeightUnitChoices.LBS and target_unit == WeightUnitChoices.KG:
+    #         return self.weight * 0.453592
+    #     else:
+    #         return self.weight
 
-    def convert_height(self, target_unit):
-        if self.height_unit == target_unit:
-            return self.height
+    # def convert_height(self, target_unit):
+    #     if self.height_unit == target_unit:
+    #         return self.height
 
-        if self.height_unit == HeightUnitChoices.CM and target_unit == HeightUnitChoices.FT:
-            feet = int(self.height / 30.48)
-            inches = round((self.height % 30.48) / 2.54)
-            return f"{feet} ft {inches} in"
-        elif self.height_unit == HeightUnitChoices.FT and target_unit == HeightUnitChoices.CM:
-            total_inches = self.height * 12
-            return round(total_inches * 2.54)
-        else:
-            return self.height
+    #     if self.height_unit == HeightUnitChoices.CM and target_unit == HeightUnitChoices.FT:
+    #         feet = int(self.height / 30.48)
+    #         inches = round((self.height % 30.48) / 2.54)
+    #         return f"{feet} ft {inches} in"
+    #     elif self.height_unit == HeightUnitChoices.FT and target_unit == HeightUnitChoices.CM:
+    #         total_inches = self.height * 12
+    #         return round(total_inches * 2.54)
+    #     else:
+    #         return self.height
         
 @receiver(post_save, sender=User)
 def create_or_update_profile(sender, instance, created, **kwargs):

@@ -50,11 +50,11 @@ def profile(request):
   profile = Profile.objects.get(user=request.user)
 
   height_display = profile.height
-  if profile.height_unit == 'ft':
-    height_display = profile.convert_height('ft')
+  # if profile.height_unit == 'ft':
+  #   height_display = profile.convert_height('ft')
   weight_display = profile.weight
-  if profile.weight_unit == 'lbs':
-    weight_display = profile.convert_weight('lbs')
+  # if profile.weight_unit == 'lbs':
+  #   weight_display = profile.convert_weight('lbs')
 
   context = {
     'profile': profile,
@@ -92,18 +92,19 @@ def signup(request):
 
 class ProfileUpdate(UpdateView):
     model = Profile
-    form_class = ProfileForm
-    template_name = 'main_app/profile_form.html'
-    context_object_name = 'profile'
+    # form_class = ProfileForm
+    fields = ['bio', 'age', 'height', 'height_unit', 'weight', 'weight_unit']
+    # template_name = 'main_app/profile_form.html'
+    # context_object_name = 'profile'
     success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         profile = form.save(commit=False)
 
-        if 'height_unit' in form.changed_data:
-            profile.height = profile.convert_height(profile.height_unit)
-        if 'weight_unit' in form.changed_data:
-            profile.weight = profile.convert_weight(profile.weight_unit)
+        # if 'height_unit' in form.changed_data:
+        #     profile.height = profile.convert_height(profile.height_unit)
+        # if 'weight_unit' in form.changed_data:
+        #     profile.weight = profile.convert_weight(profile.weight_unit)
 
         profile.save()
         return super().form_valid(form)
