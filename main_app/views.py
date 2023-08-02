@@ -4,7 +4,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile
+import requests
+import json
 
+# API-key = gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5
 # Create your views here.
 def home(request):
   return render(request, 'home.html')
@@ -19,7 +22,26 @@ def workouts_index(request):
 
 @login_required
 def exercises_index(request):
-  return render(request, 'exercises_index.html')
+  if request.method == 'GET':
+    api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
+    api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
+    try:
+      api = json.loads(api_request.content)
+      # print(api_request.content)
+    except Exception as e:
+      api = "Opps, There was an error"
+      print(e)
+  return render(request, 'exercises_index.html', {'api': api})
+  
+
+
+  # muscle = 'biceps'
+  # api_url = 'https://api.api-ninjas.com/v1/exercises?muscle={}'.format(muscle)
+  # response = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
+  # if response.status_code == requests.codes.ok:
+  #   print(response.text)
+  # else:
+  #   print("Error:", response.status_code, response.text)
 
 
 def signup(request):
