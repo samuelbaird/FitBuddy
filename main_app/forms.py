@@ -5,6 +5,7 @@ class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
         fields = '__all__'
+        exclude = ['user']
 
 class ProfileForm(forms.ModelForm):
     class Meta:

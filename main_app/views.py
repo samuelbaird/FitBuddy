@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Profile
+from .models import Profile, Exercise
 from .forms import ExerciseForm, ProfileForm
 import requests
 import json
@@ -68,13 +68,19 @@ def exercises_form(request):
   if request.method == 'POST':
     form = ExerciseForm(request.POST)
     if form.is_valid():
-      form.save()
+      exercise = form.save(commit=False)
+      exercise.user = request.user  # Set the user before saving
+      exercise.save()
+      # form.save()
       return redirect('exercises_index')
     else:
       return render(request, 'exercises_form.html', {'form': form})
   else:
       form = ExerciseForm()
-      return render(request, 'exercises_form.html', {'form': form})
+  return render(request, 'exercises_form.html', {'form': form})
+
+
+
 
 def signup(request):
   error_message = ''
