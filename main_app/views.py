@@ -64,6 +64,12 @@ def profile(request):
   return render(request, 'profile.html', context)
 
 @login_required
+def user_exercises(request):
+    user_exercises = Exercise.objects.filter(user=request.user)
+    return render(request, 'user_exercises.html', {'user_exercises': user_exercises})
+
+
+@login_required
 def exercises_form(request):
   if request.method == 'POST':
     form = ExerciseForm(request.POST)
