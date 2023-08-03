@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<h4>Exercises</h4>
+<h3>Exercises</h3>
 <div class="container">
   <div class="row">
   {% for primary_muscle, exercises in categorized_exercises_dict.items %}
@@ -10,7 +10,7 @@
       <div class="card">
         <div class="card-image">
           <img src="#">
-          <div class="card-action"><a class="btn indigo" href="{% url 'muscle_index' primary_muscle|slice:"2:-2" %}">{{ primary_muscle|slice:"2:-2"}}</a></div>
+          <div class="card-action"><a href="{% url 'muscle_exercise_index' primary_muscle|slice:"2:-2" %}">{{ primary_muscle|slice:"2:-2"}}</a></div>
         </div>
       </div>
     </div>
