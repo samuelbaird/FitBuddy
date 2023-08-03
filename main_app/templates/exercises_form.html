@@ -3,14 +3,23 @@
 {% block content %}
 
 
-{% if object %}
-<h1>Edit <span class="teal-text">{{object.name}}</span></h1>
-{% else %}
-  <h4>Add Exercise</h4>
- {% endif %} 
-  <form method="POST" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" class="btn" value="New Exercise"/>
-  </form>
-{% endblock %}
+<div class="row">
+  <div class="card">
+    <div class="card-content">
+      
+      {% if object %}
+      <h1>Edit <span class="teal-text">{{object.name}}</span></h1>
+      {% else %}
+      <span class="card-title">Add Exercise</span>
+      {% endif %} 
+      <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn" value="New Exercise"/>
+      </form>
+    </div>
+  </div>
+</div>
+
+  {% endblock %}
+  
