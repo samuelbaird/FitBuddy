@@ -34,6 +34,7 @@ def exercises_index(request):
 
   categorized_exercises_dict = dict(categorized_exercises_dict)
 
+
   return render(request, 'exercises/exercises_index.html', {
     'categorized_exercises_dict': categorized_exercises_dict
   })
@@ -46,6 +47,15 @@ def exercises_index(request):
   #   except Exception as e:
   #     api = "Opps, There was an error"
   #     print(e)
+
+@login_required
+def muscle_index(request, muscle):
+  exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
+  context = {
+      'muscle_name': muscle,
+      'exercises': exercises,
+  }
+  return render(request, 'exercises/muscle_index.html', context)
 
 @login_required
 def exercises_detail(request, exercise_id):
