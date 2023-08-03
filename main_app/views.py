@@ -4,8 +4,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Profile, Exercise
+from .models import Profile, Exercise, ImportedExercise
 from .forms import ExerciseForm, ProfileForm
+from collections import defaultdict
 import requests
 import json
 
@@ -24,16 +25,27 @@ def workouts_index(request):
 
 @login_required
 def exercises_index(request):
-  if request.method == 'GET':
-    api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
-    api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
-    try:
-      api = json.loads(api_request.content)
-      # print(api_request.content)
-    except Exception as e:
-      api = "Opps, There was an error"
-      print(e)
-  return render(request, 'exercises/exercises_index.html', {'api': api})
+  all_exercises = ImportedExercise.objects.all()
+  categorized_exercises_dict = defaultdict(list)
+
+  for exercise in all_exercises:
+      primary_muscles = exercise.primaryMuscles
+      categorized_exercises_dict[primary_muscles].append(exercise)
+
+  categorized_exercises_dict = dict(categorized_exercises_dict)
+
+  return render(request, 'exercises/exercises_index.html', {
+    'categorized_exercises_dict': categorized_exercises_dict
+  })
+  # if request.method == 'GET':
+  #   api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
+  #   api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
+  #   try:
+  #     api = json.loads(api_request.content)
+  #     # print(api_request.content)
+  #   except Exception as e:
+  #     api = "Opps, There was an error"
+  #     print(e)
 
 @login_required
 def exercises_detail(request, exercise_id):
@@ -41,19 +53,6 @@ def exercises_detail(request, exercise_id):
   return render(request, 'exercises/detail.html', {
     'exercise': exercise
   })
-
-
-
-  
-
-
-  # muscle = 'biceps'
-  # api_url = 'https://api.api-ninjas.com/v1/exercises?muscle={}'.format(muscle)
-  # response = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
-  # if response.status_code == requests.codes.ok:
-  #   print(response.text)
-  # else:
-  #   print("Error:", response.status_code, response.text)
 
 @login_required
 def profile(request):
