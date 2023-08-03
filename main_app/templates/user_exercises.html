@@ -6,9 +6,9 @@
   <div class="container">
     <div class="row">
       <div class="col s6">
-        <a href="{% url 'detail' exercise.id %}" style="color: green;">
+        <a class="yellow-text text-lighten-3" href="{% url 'detail' exercise.id %}" >
         <div class="card">
-          <div class="card-image, light-blue lighten-2">
+          <div class="card-image indigo">
             <li style="font-size: 20px">Name: {{ exercise.name }}</li> 
             <li style="font-size: 20px">Force: {{ exercise.force }}</li>
             <li style="font-size: 20px">Level: {{ exercise.level }}</li>
@@ -28,9 +28,9 @@
             
           </div>
         </a>
-          <div class="card-action">
-            <a href="{% url 'exercises_update' exercise.id %}">Edit</a>
-            <a href="{% url 'exercises_delete' exercise.id %}">Delete</a>
+          <div class="card-action yellow lighten-2">
+            <a href="{% url 'exercises_update' exercise.id %}" class="btn indigo btn-large">Edit</a>
+            <a href="{% url 'exercises_delete' exercise.id %}" class="btn-large btn indigo">Delete</a>
           </div>
         </div>
       </div>
