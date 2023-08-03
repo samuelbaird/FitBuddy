@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
 <h4>Exercises</h4>
@@ -8,7 +9,8 @@
     <div class="col s6">
       <div class="card">
         <div class="card-image">
-          <div class="card-action"><a href="#">{{ primary_muscle|slice:"2:-2"}}</a></div>
+          <img src="#">
+          <div class="card-action"><a href="{% url 'muscle_index' primary_muscle|slice:"2:-2" %}">{{ primary_muscle|slice:"2:-2"}}</a></div>
         </div>
       </div>
     </div>
