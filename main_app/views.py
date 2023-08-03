@@ -25,18 +25,13 @@ def workouts_index(request):
 
 @login_required
 def exercises_index(request):
-  # Fetch all exercise data from the database (assuming your model is named Exercise)
   all_exercises = ImportedExercise.objects.all()
-
-  # Create a defaultdict to categorize the exercises by primary muscles
   categorized_exercises_dict = defaultdict(list)
 
-  # Categorize the exercises by primary muscles
   for exercise in all_exercises:
       primary_muscles = exercise.primaryMuscles
       categorized_exercises_dict[primary_muscles].append(exercise)
 
-  # Convert the defaultdict to a regular dictionary for easier access in the template
   categorized_exercises_dict = dict(categorized_exercises_dict)
 
   return render(request, 'exercises/exercises_index.html', {
@@ -51,6 +46,13 @@ def exercises_index(request):
   #   except Exception as e:
   #     api = "Opps, There was an error"
   #     print(e)
+
+@login_required
+def exercises_detail(request, exercise_id):
+  exercise = Exercise.objects.get(id=exercise_id)
+  return render(request, 'exercises/detail.html', {
+    'exercise': exercise
+  })
 
 @login_required
 def profile(request):
@@ -85,13 +87,12 @@ def exercises_form(request):
       exercise.user = request.user  # Set the user before saving
       exercise.save()
       # form.save()
-      return redirect('exercises_index')
+      return redirect('user_exercises')
     else:
       return render(request, 'exercises_form.html', {'form': form})
   else:
       form = ExerciseForm()
   return render(request, 'exercises_form.html', {'form': form})
-
 
 
 
@@ -131,3 +132,13 @@ class ProfileUpdate(UpdateView):
 class ProfileDelete(DeleteView):
     model = Profile
     success_url = '/'
+
+
+class ExerciseUpdate(UpdateView):
+  model = Exercise
+  fields = '__all__'
+
+class ExerciseDelete(DeleteView):
+  model = Exercise
+  success_url = '/'  
+
