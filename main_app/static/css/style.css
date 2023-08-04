@@ -7,3 +7,9 @@ body {
 main {
   flex: 1 0 auto;
 }
+
+#app-icon {
+  border-radius:50%; 
+  padding-left:5%;
+  margin-top:10%;
+}
