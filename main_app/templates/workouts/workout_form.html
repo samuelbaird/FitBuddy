@@ -1,17 +1,19 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <div class="container">
   {% if form.instance.pk %}
     <h1>Edit {{ workout_name }}</h1>
   {% else %}
     <h1>Create a New Workout</h1>
   {% endif %}
-{% if form.instance.pk %}
-  <form action="{% url 'workout_update' form.instance.pk %}" method="POST">
-{% else %}
-  <form action="{% url 'workout_create' %}" method="POST">
-{% endif %}
 
+  {% if form.instance.pk %}
+    <form action="{% url 'workout_update' form.instance.pk %}" method="POST">
+  {% else %}
+    <form action="{% url 'workout_create' %}" method="POST">
+  {% endif %}
     {% csrf_token %}
+
     <div class="input-field">
       <label for="id_name">Workout Name:</label>
       <input type="text" id="id_name" name="name" value="{{ form.instance.name }}" required />
@@ -20,17 +22,20 @@
     <ul id="workout-exercises">
       {% if form.instance.pk %}
             {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
-        <li>
+        <li data-exercise-id="{{ exercise_in_workout.exercise.id }}">
           <span>{{ exercise_in_workout.exercise.name }}</span>
           <span> Sets: {{ exercise_in_workout.sets }} </span>
           <span> Weight: {{ exercise_in_workout.weight }} </span>
           <span> Reps: {{ exercise_in_workout.reps }} </span>
           <span> Tempo: {{ exercise_in_workout.tempo }} </span>
           <span> Rest: {{ exercise_in_workout.rest }} </span>
+          <button type="button" class="edit-exercise-btn">Edit</button>
+          <button type="button" class="delete-exercise-btn">Delete</button>
         </li>
       {% endfor %}
       {% endif %}
     </ul>
+
     <input type="hidden" id="exercises-input" name="exercises" value="
       {% if form.instance.pk %}
           {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
@@ -38,33 +43,42 @@
           {% endfor %}
       {% endif %}
 "/>
-    <div class="input-field">
-      <input
-        type="text"
-        id="autocomplete-input"
-        class="autocomplete"
-        placeholder="Start typing exercise name..."
-      />
-      <label for="autocomplete-input">Add Exercise to Workout</label>
-        <input type="number" id="sets-input" placeholder="Enter sets..." />
-  <label for="sets-input">Sets</label>
 
-  <input type="number" id="weight-input" placeholder="Enter weight..." />
-  <label for="weight-input">Weight</label>
-
-  <input type="number" id="reps-input" placeholder="Enter reps..." />
-  <label for="reps-input">Reps</label>
-
-  <input type="text" id="tempo-input" placeholder="Enter tempo..." />
-  <label for="tempo-input">Tempo</label>
-
-  <input type="number" id="rest-input" placeholder="Enter rest time..." />
-  <label for="rest-input">Rest Time</label>
+    <div class="row">
+        <div class="input-field col s12">
+          <input type="text" id="autocomplete-input" class="autocomplete" placeholder="Start typing exercise name..." />
+          <label for="autocomplete-input">Exercise</label>
+        </div>
     </div>
 
-    <button type="button" id="add-exercise-btn" class="btn">
-      Add Exercise
-    </button>
+    <div class="row">
+        <div class="input-field col s2">
+          <input type="number" id="sets-input" placeholder="Sets..." />
+          <label for="sets-input">Sets</label>
+        </div>
+
+        <div class="input-field col s2">
+          <input type="number" id="weight-input" placeholder="Weight..." />
+          <label for="weight-input">Weight</label>
+        </div>
+
+        <div class="input-field col s2">
+          <input type="number" id="reps-input" placeholder="Reps..." />
+          <label for="reps-input">Reps</label>
+        </div>
+
+        <div class="input-field col s2">
+          <input type="text" id="tempo-input" placeholder="Tempo..." />
+          <label for="tempo-input">Tempo</label>
+        </div>
+
+        <div class="input-field col s2">
+          <input type="number" id="rest-input" placeholder="Rest time..." />
+          <label for="rest-input">Rest Time</label>
+        </div>
+    </div>
+
+    <button type="button" id="add-exercise-btn" class="btn">Add Exercise</button>
     <input type="submit" value="Submit" class="btn" />
   </form>
 </div>
@@ -72,6 +86,10 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('add-exercise-btn').addEventListener('click', addExerciseToWorkout);
+    const editExerciseButtons = document.querySelectorAll('.edit-exercise-btn');
+    editExerciseButtons.forEach(button => button.addEventListener('click', editExercise));
+    const deleteExerciseButtons = document.querySelectorAll('.delete-exercise-btn');
+    deleteExerciseButtons.forEach(button => button.addEventListener('click', deleteExercise));
     const exerciseData = {
       {% for exercise in exercise_list %}
       "{{ exercise.name }}": "{{ exercise.id }}",
@@ -88,6 +106,18 @@
 
     const workoutExercisesList = document.getElementById('workout-exercises');
     const exercisesInput = document.getElementById('exercises-input');
+
+  function deleteExercise(e) {
+    const listItem = e.target.closest('li');
+    const exerciseId = listItem.getAttribute('data-exercise-id');
+
+    workoutExercisesList.removeChild(listItem);
+
+    const currentExercises = new Set(exercisesInput.value.split(',').filter(Boolean));
+    currentExercises.delete(exerciseId);
+
+    exercisesInput.value = [...currentExercises].join(',');
+  }
 
 function addExerciseToWorkout() {
   const autocompleteInput = document.getElementById('autocomplete-input');
@@ -138,6 +168,13 @@ function addExerciseToWorkout() {
     restElement.setAttribute('data-attribute', 'rest');
     restElement.textContent = 'Rest: ' + rest;
     listItem.appendChild(restElement);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'delete-exercise-btn';
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', deleteExercise);
+    listItem.appendChild(deleteButton);
 
     workoutExercisesList.appendChild(listItem);
 
