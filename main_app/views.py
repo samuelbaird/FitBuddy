@@ -59,15 +59,10 @@ def muscle_index(request, muscle):
 
 def muscle_exercise_detail(request, muscle, exercise_id):
   exercise = ImportedExercise.objects.get(id=exercise_id)
-  text_array = exercise.instructions.split('\n')
-
-  all_text = ' '.join(text_array)
-  separated_items = all_text.split('. ')
-  separated_items = [item.strip() for item in separated_items]
+  
   context = {
       'muscle_name': muscle,
       'exercise': exercise,
-      'separated_items': separated_items,
   }
   return render(request, 'exercises/muscle_exercise_detail.html', context)
 
