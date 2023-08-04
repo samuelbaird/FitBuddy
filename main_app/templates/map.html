@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="height: 50vh;" id="map">
+<script>
+
+var map = L.map('map').setView([38.9072, -77.0369], 13);
+map.zoomControl.setPosition('topright');
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+// add incoming marker to center
+L.marker([38.9072, -77.0369], 13).addTo(map)
+    .bindPopup()
+    .openPopup();
+
+    // add map scale
+L.control.scale().addTo(map);
+
+
+
+
+
+</script>
+
+
+</div>
+
+
+{% endblock  %}
