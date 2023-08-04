@@ -14,10 +14,47 @@
         }).addTo(map);
 
         var markers = [];
+        var maxPoints = 2;
+        var routeLayer;
+        var centerMarker;
+
+        function haversineDistance(latlng1, latlng2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = latlng1.lat * Math.PI / 180;
+            const φ2 = latlng2.lat * Math.PI / 180;
+            const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+            const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+
+            return distance;
+        }
+
+        function updateDistance() {
+            if (markers.length === 2) {
+                var latlng1 = markers[0].getLatLng();
+                var latlng2 = markers[1].getLatLng();
+                var distanceMeters = haversineDistance(latlng1, latlng2);
+                var distanceKm = distanceMeters / 1000; // Convert to kilometers
+                var distanceMiles = distanceMeters / 1609.344; // Convert to miles
+
+                centerMarker.setPopupContent('This is the center marker<br>Distance (Metric): ' + distanceKm.toFixed(2) + ' km<br>Distance (Standard): ' + distanceMiles.toFixed(2) + ' miles');
+            }
+        }
 
         function drawRoute() {
-            if (markers.length >= 2) {
-                var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Replace this with your Mapbox access token
+            if (markers.length === 2) {
+                var latlng1 = markers[0].getLatLng();
+                var latlng2 = markers[1].getLatLng();
+
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
+
+                var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Your Mapbox access token
                 var waypoints = markers.map(marker => marker.getLatLng());
                 var waypointsStr = waypoints.map(point => point.lng + ',' + point.lat).join(';');
                 var url = `https://api.mapbox.com/directions/v5/mapbox/driving/${waypointsStr}?geometries=geojson&access_token=${accessToken}`;
@@ -26,30 +63,42 @@
                     .then(response => response.json())
                     .then(data => {
                         var route = data.routes[0].geometry;
-                        L.geoJSON(route, { color: 'blue' }).addTo(map);
+                        routeLayer = L.geoJSON(route, { color: 'blue' }).addTo(map);
+                        updateDistance();
                     });
+            } else {
+                centerMarker.setPopupContent('This is the center marker');
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
             }
         }
 
         function onMapClick(e) {
-            var clickedCoordinates = e.latlng;
-            var marker = L.marker(clickedCoordinates).addTo(map)
-                .bindPopup('You clicked at ' + clickedCoordinates.toString())
-                .openPopup();
-            markers.push(marker);
-            drawRoute();
+            if (markers.length < maxPoints) {
+                var clickedCoordinates = e.latlng;
+                var marker = L.marker(clickedCoordinates).addTo(map)
+                    .bindPopup('You clicked at ' + clickedCoordinates.toString())
+                    .openPopup();
+                markers.push(marker);
+                drawRoute();
+            }
         }
 
         map.on('click', onMapClick);
 
         // Add the initial marker to the center
-        var centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+        centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
             .bindPopup('This is the center marker')
             .openPopup();
         markers.push(centerMarker);
 
         // Add the map scale control
         L.control.scale().addTo(map);
+
+        // Add the measurement control
+        L.control.measure({ position: 'topleft', primaryLengthUnit: 'kilometers', secondaryLengthUnit: 'miles', primaryAreaUnit: undefined, secondaryAreaUnit: undefined }).addTo(map);
+
 
 
 
