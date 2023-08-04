@@ -55,10 +55,13 @@ def exercises_index(request):
 @login_required
 def muscle_index(request, muscle):
   exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
+  for exercise in exercises:
+     exercise.images = eval(exercise.images)
   context = {
       'muscle_name': muscle,
       'exercises': exercises,
   }
+  print(context)
   return render(request, 'exercises/muscle_index.html', context)
 
 def muscle_exercise_detail(request, muscle, exercise_id):
