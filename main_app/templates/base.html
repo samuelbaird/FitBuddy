@@ -5,83 +5,119 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FitBuddy</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </head>
   <header>
-      <nav>
-    <div class="nav-wrapper indigo">
-      <a href="{% url 'home' %}" class="brand-logo"><img style="border-radius:50%; padding-left:5%;margin-top:10%;" id="app-icon" src="{% static 'main_app/app-icon.jpg' %}" alt=""></a>
-      <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-      <ul class="right hide-on-med-and-down">
-        {% if user.is_authenticated %}
-        <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
-        <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
-        <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
-        <li><a href="{% url 'workout_create' %}">Create Workout</a></li>
-        <li><a href="{% url 'profile' %}">Profile</a></li>
-        <li><a href="{% url 'logout' %}">Log Out</a></li>
-        {% else %}
-        <li><a href="{% url 'signup' %}">Sign Up</a></li>
-        <li><a href="{% url 'login' %}">Log In</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav>
-  {% if user.is_authenticated %}
-  <ul class="sidenav" id="mobile-demo">
-  <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
-  <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
-  <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
-  <li><a href="{% url 'workout_create' %}">Create Workout</a></li>
-  <li><a href="{% url 'profile' %}">Profile</a></li>
-  <li><a href="{% url 'logout' %}">Log Out</a></li>
-  {% else %}
-  <li><a href="{% url 'signup' %}">Sign Up</a></li>
-  <li><a href="{% url 'login' %}">Log In</a></li>
-  {% endif %}
-  </ul>
-          
+    <nav>
+      <div class="nav-wrapper indigo">
+        <a href="{% url 'home' %}" class="brand-logo"
+          ><img
+            style="border-radius: 50%; padding-left: 5%; margin-top: 10%"
+            id="app-icon"
+            src="{% static 'main_app/app-icon.jpg' %}"
+            alt=""
+        /></a>
+        <a href="#" data-target="mobile-demo" class="sidenav-trigger"
+          ><i class="material-icons">menu</i></a
+        >
+        <ul class="right hide-on-med-and-down">
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
+          <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
+          <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
+          <li><a href="{% url 'workout_create' %}">Create Workout</a></li>
+          <li><a href="{% url 'profile' %}">Profile</a></li>
+          <li><a href="{% url 'logout' %}">Log Out</a></li>
+          {% else %}
+          <li><a href="{% url 'signup' %}">Sign Up</a></li>
+          <li><a href="{% url 'login' %}">Log In</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+    {% if user.is_authenticated %}
+    <ul class="sidenav" id="mobile-demo">
+      <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
+      <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
+      <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
+      <li><a href="{% url 'map' %}">Map</a></li>
+      <li><a href="{% url 'workout_create' %}">Create Workout</a></li>
+      <li><a href="{% url 'profile' %}">Profile</a></li>
+      <li><a href="{% url 'logout' %}">Log Out</a></li>
+      {% else %}
+      <li><a href="{% url 'signup' %}">Sign Up</a></li>
+      <li><a href="{% url 'login' %}">Log In</a></li>
+      {% endif %}
+    </ul>
   </header>
   <body>
     <!-- style="background-image: url({% static 'main_app/fitbuddy-bg.jpeg' %}) "   set in body -->
-    <main class="container">
-      {% block content %}
-      {% endblock %}
-    </main>
+    <main class="container">{% block content %} {% endblock %}</main>
     <footer class="page-footer indigo">
       <div class="container">
         <div class="row">
           <div class="col l6 s12">
             <h6 class="white-text">FitBuddy Inc.</h6>
-            <p class="grey-text text-lighten-4">FitBuddy is the companion app that will help you get your ass back into the a healthier lifestyle.</p>
+            <p class="grey-text text-lighten-4">
+              FitBuddy is the companion app that will help you get your ass back
+              into the a healthier lifestyle.
+            </p>
           </div>
           <div class="col l4 offset-l2 s12">
             <h6 class="white-text">FitBuddy Links</h6>
             <ul>
-              <li><a class="grey-text text-lighten-3" href="{% url 'about' %}">About This App</a></li>
-              <li><a class="grey-text text-lighten-3" href="#!">Contact Us</a></li>
+              <li>
+                <a class="grey-text text-lighten-3" href="{% url 'about' %}"
+                  >About This App</a
+                >
+              </li>
+              <li>
+                <a class="grey-text text-lighten-3" href="#!">Contact Us</a>
+              </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-copyright">
-        <div class="container">
-        © 2023 FitBuddy
-        </div>
+        <div class="container">© 2023 FitBuddy</div>
       </div>
     </footer>
   </body>
 </html>
 <script>
-
   const options = {};
 
-  document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.sidenav');
-  var instances = M.Sidenav.init(elems, options);
-});
-
+  document.addEventListener("DOMContentLoaded", function () {
+    var elems = document.querySelectorAll(".sidenav");
+    var instances = M.Sidenav.init(elems, options);
+  });
 </script>
