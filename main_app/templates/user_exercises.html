@@ -1,34 +1,36 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
-
-
-          
-
-    <h1>Your Exercises</h1>
-    <ul>
-        {% for exercise in user_exercises %}
-        <div class="container">
-  <div class="row">
-    <div class="col s6">
-      <div class="card">
-        <div class="card-image">
-            <li style="font-size: 20px;" >Name: {{ exercise.name }} </li>
-            <li style="font-size: 20px;" >Force: {{ exercise.force }} </li>
-            <li style="font-size: 20px;" > Level: {{ exercise.level }} </li>
-            <li style="font-size: 20px;" > Mechanic: {{ exercise.mechanic }} </li>
-            <li style="font-size: 20px;" > Equipment: {{ exercise.equipment }} </li>
-            <li style="font-size: 20px;" > Primary Muscles: {{ exercise.primaryMuscles }} </li>
-            <li style="font-size: 20px;" > Secondary Muscles: {{ exercise.secondaryMuscles }} </li>
-            <li style="font-size: 20px;" >Category: {{ exercise.category }} </li>
-            <li style="font-size: 20px;" > Images: {{ exercise.images }} </li>
-            <li style="font-size: 20px;" >Instructions: {{ exercise.instructions }} </li>
-            </div>
+<h1>Your Exercises</h1>
+<ul>
+  {% for exercise in user_exercises %}
+  <div class="container">
+    <div class="row">
+      <div class="col s6">
+        <a class="yellow-text text-lighten-2" href="{% url 'detail' exercise.id %}" >
+        <div class="card">
+          <div class="card-image indigo">
+            <li style="font-size: 20px"> <span class="white-text">  Name: </span> {{ exercise.name }}</li> 
+            <li style="font-size: 20px"><span class="white-text">Force: </span> {{ exercise.force }}</li>
+            <li style="font-size: 20px"><span class="white-text">Level: </span> {{ exercise.level }}</li>
+            <li style="font-size: 20px"><span class="white-text">Mechanic: </span> {{ exercise.mechanic }}</li>
+            <li style="font-size: 20px"><span class="white-text">Equipment: </span> {{ exercise.equipment }}</li>
+            <li style="font-size: 20px"><span class="white-text"> Primary Muscles: </span> {{ exercise.primaryMuscles }} </li>
+            <li style="font-size: 20px"> <span class="white-text"> Secondary Muscles: </span> {{ exercise.secondaryMuscles }} </li>
+            <li style="font-size: 20px"> <span class="white-text"> Category: </span> {{ exercise.category }}</li>
+            <li style="font-size: 20px"><span class="white-text"> Images: </span> {{ exercise.images }}</li>
+            <li style="font-size: 20px"> <span class="white-text"> Instructions: </span> {{ exercise.instructions }} </li>
+            
+          </div>
+          </a>
+          <div class="card-action yellow lighten-2">
+            <a href="{% url 'exercises_update' exercise.id %}" class="btn indigo btn-large">Edit</a>
+            <a href="{% url 'exercises_delete' exercise.id %}" class="btn-large btn indigo">Delete</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-        {% endfor %}
-    </ul>
+  {% endfor %}
+</ul>
 
 {% endblock %}

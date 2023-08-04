@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+ <h3>{{ muscle_name|capfirst }} Exercises </h3>
+  <div class="container">
+    <div class="row">
+      {% for exercise in exercises %}
+      <div class="col s4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{{ exercise.images }}">
+            <div class="card-action">
+              {% comment %} <a href="/exercises/{{ exercise.id }}">{{ exercise.name }}</a> {% endcomment %}
+              <a href="{% url 'detail' exercise.id %}">{{ exercise.name }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

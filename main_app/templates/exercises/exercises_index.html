@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
-<h4>Exercises</h4>
-{% if api %}
+<h3>Exercises</h3>
 <div class="container">
   <div class="row">
-    {% for exercises in api %}
+  {% for primary_muscle, exercises in categorized_exercises_dict.items %}
     <div class="col s6">
       <div class="card">
         <div class="card-image">
-          <div class="card-action"><a href="#">{{ exercises.muscle }}</a></div>
+          <img src="#">
+          <div class="card-action"><a href="{% url 'muscle_exercise_index' primary_muscle|slice:"2:-2" %}">{{ primary_muscle|slice:"2:-2"}}</a></div>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
 </div>
-{% endif %}
 {% endblock %}

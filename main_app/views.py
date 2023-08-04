@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile, Exercise, Workout, ExerciseInWorkout, ImportedExercise
 from .forms import ExerciseForm, ProfileForm, WorkoutForm
+from collections import defaultdict
 import requests
 import json
 
@@ -24,26 +25,52 @@ def workouts_index(request):
 
 @login_required
 def exercises_index(request):
-  if request.method == 'GET':
-    api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
-    api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
-    try:
-      api = json.loads(api_request.content)
-      # print(api_request.content)
-    except Exception as e:
-      api = "Opps, There was an error"
-      print(e)
-  return render(request, 'exercises/exercises_index.html', {'api': api})
-  
+  all_exercises = ImportedExercise.objects.all()
+  categorized_exercises_dict = defaultdict(list)
+
+  for exercise in all_exercises:
+      primary_muscles = exercise.primaryMuscles
+      categorized_exercises_dict[primary_muscles].append(exercise)
+
+  categorized_exercises_dict = dict(categorized_exercises_dict)
 
 
-  # muscle = 'biceps'
-  # api_url = 'https://api.api-ninjas.com/v1/exercises?muscle={}'.format(muscle)
-  # response = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
-  # if response.status_code == requests.codes.ok:
-  #   print(response.text)
-  # else:
-  #   print("Error:", response.status_code, response.text)
+  return render(request, 'exercises/exercises_index.html', {
+    'categorized_exercises_dict': categorized_exercises_dict
+  })
+  # if request.method == 'GET':
+  #   api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
+  #   api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
+  #   try:
+  #     api = json.loads(api_request.content)
+  #     # print(api_request.content)
+  #   except Exception as e:
+  #     api = "Opps, There was an error"
+  #     print(e)
+
+@login_required
+def muscle_index(request, muscle):
+  exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
+  context = {
+      'muscle_name': muscle,
+      'exercises': exercises,
+  }
+  return render(request, 'exercises/muscle_index.html', context)
+
+# def muscle_exercise_detail(request, muscle, exercise_id):
+#   exercise = ImportedExercise.objects.get(id=exercise_id)
+#   context = {
+#       'muscle_name': muscle,
+#       'exercise': exercise,
+#   }
+#   return render(request, 'exercises/muscle_exercise_detail.html', context)
+
+@login_required
+def exercises_detail(request, exercise_id):
+  exercise = Exercise.objects.get(id=exercise_id)
+  return render(request, 'exercises/detail.html', {
+    'exercise': exercise
+  })
 
 @login_required
 def profile(request):
@@ -78,13 +105,12 @@ def exercises_form(request):
       exercise.user = request.user  # Set the user before saving
       exercise.save()
       # form.save()
-      return redirect('exercises_index')
+      return redirect('user_exercises')
     else:
       return render(request, 'exercises_form.html', {'form': form})
   else:
       form = ExerciseForm()
   return render(request, 'exercises_form.html', {'form': form})
-
 
 
 
@@ -124,6 +150,7 @@ class ProfileUpdate(UpdateView):
 class ProfileDelete(DeleteView):
     model = Profile
     success_url = '/'
+
 
 class WorkoutDelete(DeleteView):
     model = Workout
@@ -208,3 +235,12 @@ def update_workout(request, pk):
         'exercise_list': exercise_list,
         'workout_name': workout.name,  
     })
+
+class ExerciseUpdate(UpdateView):
+  model = Exercise
+  fields = '__all__'
+
+class ExerciseDelete(DeleteView):
+  model = Exercise
+  success_url = '/'  
+

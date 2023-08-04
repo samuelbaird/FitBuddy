@@ -90,7 +90,7 @@ class Exercise(models.Model):
      secondaryMuscles = models.CharField(max_length=100, default='')
      category = models.CharField(max_length=100, default='')
      images = models.CharField(max_length=100, default='')
-     instructions = models.CharField(max_length=200, default='')
+     instructions = models.CharField(max_length=1000, default='')
 
      user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -110,7 +110,7 @@ class ImportedExercise(models.Model):
      secondaryMuscles = models.CharField(max_length=100, default='')
      category = models.CharField(max_length=100, default='')
      images = models.CharField(max_length=100, default='')
-     instructions = models.CharField(max_length=200, default='')
+     instructions = models.CharField(max_length=1000, default='')
 
      def __str__(self):
         return f'{self.name} ({self.id})'
