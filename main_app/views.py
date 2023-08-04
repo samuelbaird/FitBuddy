@@ -165,8 +165,9 @@ class WorkoutDelete(DeleteView):
     model = Workout
     success_url = '/workouts/'
 
+@login_required
 def workouts_index (request):
-    workouts = Workout.objects.all()
+    workouts = Workout.objects.filter(user=request.user)
     return render(request, 'workouts/index.html', {
         'workouts': workouts
     })
