@@ -62,15 +62,22 @@ def muscle_index(request, muscle):
       'muscle_name': muscle,
       'exercises': exercises,
   }
-  print(context)
   return render(request, 'exercises/muscle_index.html', context)
 
 def muscle_exercise_detail(request, muscle, exercise_id):
   exercise = ImportedExercise.objects.get(id=exercise_id)
+  exercise.instructions = eval(exercise.instructions)
+  
+  steps_list = []
+  for instruction in exercise.instructions:
+    steps = instruction.split('. ')
+    steps_list.extend(steps)
+
   exercise.images = eval(exercise.images)
   context = {
       'muscle_name': muscle,
       'exercise': exercise,
+      'steps_list': steps_list,
   }
   return render(request, 'exercises/muscle_exercise_detail.html', context)
 

@@ -13,7 +13,7 @@
           <div class="card-image">
             {% for image in exercise.images %}
               {% if forloop.counter0 == 0 %}
-                <img src="../../static/exercises_images/{{ image }}">
+                <img style="height: 10rem;" src="../../static/exercises_images/{{ image }}">
               {% endif %}
             {% endfor %}
             <div class="card-action">
