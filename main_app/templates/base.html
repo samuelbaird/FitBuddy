@@ -11,27 +11,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </head>
   <header>
-    <nav>
-      <div class="nav-wrapper indigo">
-        <a style="padding-left: 0.5%;" href="{% url 'home' %}" class="brand-logo"
-          ><i class="large material-icons">home</i></a
-        >
-        <ul class="right hide-on-med-and-down">
-          {% if user.is_authenticated %}
-          <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
-          <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
-          <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
-          <li><a href="{% url 'profile' %}">Profile</a></li>
-          <li><a href="{% url 'logout' %}">Log Out</a></li>
-          {% else %}
-          <li><a href="{% url 'signup' %}">Sign Up</a></li>
-          <li><a href="{% url 'login' %}">Log In</a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
+      <nav>
+    <div class="nav-wrapper indigo">
+      <a href="{% url 'home' %}" class="brand-logo"><img style="border-radius:50%; padding-left:5%;margin-top:10%;" id="app-icon" src="{% static 'main_app/app-icon.jpg' %}" alt=""></a>
+      <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+      <ul class="right hide-on-med-and-down">
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
+        <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
+        <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
+        <li><a href="{% url 'profile' %}">Profile</a></li>
+        <li><a href="{% url 'logout' %}">Log Out</a></li>
+        {% else %}
+        <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        <li><a href="{% url 'login' %}">Log In</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <ul class="sidenav" id="mobile-demo">
+  <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
+  <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
+  <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
+  <li><a href="{% url 'profile' %}">Profile</a></li>
+  <li><a href="{% url 'logout' %}">Log Out</a></li>
+  </ul>
+          
   </header>
   <body>
-    <main class="container">{% block content %} {% endblock %}</main>
+    <main class="container">
+      {% block content %}
+      {% endblock %}
+    </main>
   </body>
 </html>
+<script>
+
+  const options = {};
+
+  document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.sidenav');
+  var instances = M.Sidenav.init(elems, options);
+});
+
+</script>
