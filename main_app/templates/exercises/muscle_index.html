@@ -12,7 +12,8 @@
           <div class="card-image">
             <img src="{{ exercise.images }}">
             <div class="card-action">
-              <a href="/exercises/{{ exercise.id }}">{{ exercise.name }}</a>
+              {% comment %} <a href="/exercises/{{ exercise.id }}">{{ exercise.name }}</a> {% endcomment %}
+              <a href="{% url 'detail' exercise.id %}">{{ exercise.name }}</a>
             </div>
           </div>
         </div>
