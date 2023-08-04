@@ -25,3 +25,10 @@ main {
     margin-right: 5px;
     border-radius: 5px;
   }
+
+#app-icon {
+  border-radius:50%; 
+  padding-left:5%;
+  margin-top:10%;
+}
+

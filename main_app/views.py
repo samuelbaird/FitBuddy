@@ -19,6 +19,9 @@ def home(request):
 def about(request):
   return render(request, 'about.html')
 
+def map(request):
+  return render(request, 'map.html')
+
 
 @login_required
 def workouts_index(request):
@@ -58,13 +61,14 @@ def muscle_index(request, muscle):
   }
   return render(request, 'exercises/muscle_index.html', context)
 
-# def muscle_exercise_detail(request, muscle, exercise_id):
-#   exercise = ImportedExercise.objects.get(id=exercise_id)
-#   context = {
-#       'muscle_name': muscle,
-#       'exercise': exercise,
-#   }
-#   return render(request, 'exercises/muscle_exercise_detail.html', context)
+def muscle_exercise_detail(request, muscle, exercise_id):
+  exercise = ImportedExercise.objects.get(id=exercise_id)
+  
+  context = {
+      'muscle_name': muscle,
+      'exercise': exercise,
+  }
+  return render(request, 'exercises/muscle_exercise_detail.html', context)
 
 @login_required
 def exercises_detail(request, exercise_id):
