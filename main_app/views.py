@@ -235,6 +235,7 @@ def create_workout(request):
                     exercises_in_workout.append(exercise_in_workout)
 
             if all_exercises_valid:
+                workout.user = request.user
                 workout.save()
                 for exercise_in_workout in exercises_in_workout:
                     exercise_in_workout.save()

@@ -2,12 +2,22 @@
 
 <h1>Your Workout Templates</h1>
 
+<div class="row">
 {% for workout in workouts %}
-<div class="card">
-  <a href="{% url 'workouts_detail' workout.id %}">
-    <div class="card-content">
-      <span class="card-title">{{ workout.name }}</span>
+  <div class="col s12 m6">
+    <div class="card blue-grey darken-1">
+      <div class="card-content white-text">
+        <a href="{% url 'workouts_detail' workout.id %}" class="white-text">
+          <span class="card-title">{{ workout.name }}</span>
+        </a>
+      </div>
+      <div class="card-action">
+        <a href="{% url 'workout_update' workout.id %}" class="waves-effect waves-light btn-small blue">Edit</a>
+        <a href="{% url 'workout_delete' workout.id %}" class="waves-effect waves-light btn-small red">Delete</a>
+      </div>
     </div>
-  </a>
+  </div>
+{% endfor %}
 </div>
-{% endfor %} {% endblock %}
+
+{% endblock %}

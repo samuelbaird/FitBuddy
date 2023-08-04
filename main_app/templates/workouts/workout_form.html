@@ -29,7 +29,6 @@
           <span> Reps: {{ exercise_in_workout.reps }} </span>
           <span> Tempo: {{ exercise_in_workout.tempo }} </span>
           <span> Rest: {{ exercise_in_workout.rest }} </span>
-          <button type="button" class="edit-exercise-btn">Edit</button>
           <button type="button" class="delete-exercise-btn">Delete</button>
         </li>
       {% endfor %}
@@ -86,8 +85,6 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('add-exercise-btn').addEventListener('click', addExerciseToWorkout);
-    const editExerciseButtons = document.querySelectorAll('.edit-exercise-btn');
-    editExerciseButtons.forEach(button => button.addEventListener('click', editExercise));
     const deleteExerciseButtons = document.querySelectorAll('.delete-exercise-btn');
     deleteExerciseButtons.forEach(button => button.addEventListener('click', deleteExercise));
     const exerciseData = {
