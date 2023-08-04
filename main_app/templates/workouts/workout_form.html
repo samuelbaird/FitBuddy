@@ -5,7 +5,12 @@
   {% else %}
     <h1>Create a New Workout</h1>
   {% endif %}
+{% if form.instance.pk %}
+  <form action="{% url 'workout_update' form.instance.pk %}" method="POST">
+{% else %}
   <form action="{% url 'workout_create' %}" method="POST">
+{% endif %}
+
     {% csrf_token %}
     <div class="input-field">
       <label for="id_name">Workout Name:</label>
