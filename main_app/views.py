@@ -183,6 +183,8 @@ def create_workout(request):
             all_exercises_valid = True
             exercises_in_workout = []
             for exercise_id in exercise_ids:
+              exercise_id = exercise_id.strip() 
+              if exercise_id:
                 exercise = ImportedExercise.objects.get(pk=int(exercise_id))
                 exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
  
@@ -244,20 +246,26 @@ def update_workout(request, pk):
 
     if request.method == 'POST':
         form = WorkoutForm(request.POST, instance=workout)
+        print(request.POST)
         if form.is_valid():
+            print('form is valid')
             form.save()
 
+            exercise_ids = request.POST.getlist('exercises')
 
-            exercise_ids = request.POST.getlist('exercises')  
-
-
-            ExerciseInWorkout.objects.filter(workout=workout).delete()
-
+            # Retrieve all ExerciseInWorkout instances related to this workout into a dictionary
+            exercises_in_workout = {e.exercise.id: e for e in ExerciseInWorkout.objects.filter(workout=workout)}
 
             for exercise_id in exercise_ids:
                 exercise = ImportedExercise.objects.get(pk=int(exercise_id))
-                exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
- 
+
+                # If this exercise is already in the workout, update it and remove it from the dictionary
+                if exercise.id in exercises_in_workout:
+                    exercise_in_workout = exercises_in_workout.pop(exercise.id)
+                else:
+                    # Otherwise, create a new ExerciseInWorkout instance
+                    exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
+
                 exercise_in_workout.sets = request.POST.get(f'sets_{exercise_id}')
                 exercise_in_workout.weight = request.POST.get(f'weight_{exercise_id}')
                 exercise_in_workout.reps = request.POST.get(f'reps_{exercise_id}')
@@ -265,15 +273,21 @@ def update_workout(request, pk):
                 exercise_in_workout.rest = request.POST.get(f'rest_{exercise_id}')
                 exercise_in_workout.save()
 
+            # Delete any remaining ExerciseInWorkout instances that were not included in the updated workout
+            for remaining in exercises_in_workout.values():
+                remaining.delete()
+
             return redirect('workouts_detail', pk=workout.pk)
     else:
         form = WorkoutForm(instance=workout)
+        if not form.is_valid():
+            print('form is not valid')
 
     exercise_list = ImportedExercise.objects.all()
     return render(request, 'workouts/workout_form.html', {
         'form': form,
         'exercise_list': exercise_list,
-        'workout_name': workout.name,  
+        'workout_name': workout.name,
     })
 
 class ExerciseUpdate(UpdateView):
