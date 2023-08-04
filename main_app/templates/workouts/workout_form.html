@@ -1,24 +1,4 @@
 {% extends 'base.html' %} {% block content %}
-<style>
-  #workout-exercises li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  #workout-exercises label {
-    margin-right: 10px;
-  }
-
-  #workout-exercises li span[data-attribute] {
-    padding: 5px;
-    background-color: #f2f2f2;
-    border: 1px solid #ccc;
-    margin-right: 5px;
-    border-radius: 5px;
-  }
-</style>
-
 <div class="container">
   {% if form.instance.pk %}
     <h1>Edit {{ workout_name }}</h1>
@@ -32,7 +12,18 @@
       <input type="text" id="id_name" name="name" value="{{ form.instance.name }}" required />
     </div>
 
-    <ul id="workout-exercises"></ul>
+    <ul id="workout-exercises">
+            {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
+        <li>
+          <span>{{ exercise_in_workout.exercise.name }}</span>
+          <span> Sets: {{ exercise_in_workout.sets }} </span>
+          <span> Weight: {{ exercise_in_workout.weight }} </span>
+          <span> Reps: {{ exercise_in_workout.reps }} </span>
+          <span> Tempo: {{ exercise_in_workout.tempo }} </span>
+          <span> Rest: {{ exercise_in_workout.rest }} </span>
+        </li>
+      {% endfor %}
+    </ul>
     <input type="hidden" id="exercises-input" name="exercises" />
 
     <div class="input-field">

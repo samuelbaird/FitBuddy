@@ -7,3 +7,21 @@ body {
 main {
   flex: 1 0 auto;
 }
+
+  #workout-exercises li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  #workout-exercises label {
+    margin-right: 10px;
+  }
+
+  #workout-exercises li span[data-attribute] {
+    padding: 5px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    margin-right: 5px;
+    border-radius: 5px;
+  }
