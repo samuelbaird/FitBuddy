@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Profile, Exercise
-from .forms import ExerciseForm, ProfileForm
+from .models import Profile, Exercise, Workout, ExerciseInWorkout, ImportedExercise
+from .forms import ExerciseForm, ProfileForm, WorkoutForm
 import requests
 import json
 
@@ -124,3 +124,87 @@ class ProfileUpdate(UpdateView):
 class ProfileDelete(DeleteView):
     model = Profile
     success_url = '/'
+
+class WorkoutDelete(DeleteView):
+    model = Workout
+    success_url = '/workouts/'
+
+def workouts_index (request):
+    workouts = Workout.objects.all()
+    return render(request, 'workouts/index.html', {
+        'workouts': workouts
+    })
+
+def workouts_detail(request, pk):
+    workout = Workout.objects.get(id=pk)
+    exercise_in_workouts = ExerciseInWorkout.objects.filter(workout=workout)
+    return render(request, 'workouts/detail.html', {
+        'workout': workout,
+        'exercise_in_workouts': exercise_in_workouts,
+    })
+
+def create_workout(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = WorkoutForm(request.POST)
+        if form.is_valid():
+            print('form is valid')
+            workout = form.save()
+
+            exercise_ids = request.POST.getlist('exercises')  
+
+            for exercise_id in exercise_ids:
+                exercise = ImportedExercise.objects.get(pk=int(exercise_id))
+                exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
+ 
+                exercise_in_workout.sets = request.POST.get(f'sets_{exercise_id}')
+                exercise_in_workout.weight = request.POST.get(f'weight_{exercise_id}')
+                exercise_in_workout.reps = request.POST.get(f'reps_{exercise_id}')
+                exercise_in_workout.tempo = request.POST.get(f'tempo_{exercise_id}')
+                exercise_in_workout.rest = request.POST.get(f'rest_{exercise_id}')
+                exercise_in_workout.save()
+
+            return redirect('workouts_detail', pk=workout.pk)
+    else:
+        print('form is not valid')
+        form = WorkoutForm()
+
+    exercise_list = ImportedExercise.objects.all()
+    return render(request, 'workouts/workout_form.html', {'form': form, 'exercise_list': exercise_list})
+
+def update_workout(request, pk):
+    workout = get_object_or_404(Workout, pk=pk)
+
+    if request.method == 'POST':
+        form = WorkoutForm(request.POST, instance=workout)
+        if form.is_valid():
+            form.save()
+
+
+            exercise_ids = request.POST.getlist('exercises')  
+
+
+            ExerciseInWorkout.objects.filter(workout=workout).delete()
+
+
+            for exercise_id in exercise_ids:
+                exercise = ImportedExercise.objects.get(pk=int(exercise_id))
+                exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
+ 
+                exercise_in_workout.sets = request.POST.get(f'sets_{exercise_id}')
+                exercise_in_workout.weight = request.POST.get(f'weight_{exercise_id}')
+                exercise_in_workout.reps = request.POST.get(f'reps_{exercise_id}')
+                exercise_in_workout.tempo = request.POST.get(f'tempo_{exercise_id}')
+                exercise_in_workout.rest = request.POST.get(f'rest_{exercise_id}')
+                exercise_in_workout.save()
+
+            return redirect('workouts_detail', pk=workout.pk)
+    else:
+        form = WorkoutForm(instance=workout)
+
+    exercise_list = ImportedExercise.objects.all()
+    return render(request, 'workouts/workout_form.html', {
+        'form': form,
+        'exercise_list': exercise_list,
+        'workout_name': workout.name,  
+    })
