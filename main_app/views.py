@@ -67,7 +67,7 @@ def muscle_index(request, muscle):
 
 def muscle_exercise_detail(request, muscle, exercise_id):
   exercise = ImportedExercise.objects.get(id=exercise_id)
-  
+  exercise.images = eval(exercise.images)
   context = {
       'muscle_name': muscle,
       'exercise': exercise,
