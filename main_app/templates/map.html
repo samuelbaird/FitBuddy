@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="height: 50vh;" id="map">
+<script>
+
+ var map = L.map('map').setView([38.9072, -77.0369], 13);
+        map.zoomControl.setPosition('topright');
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var markers = [];
+
+        function drawRoute() {
+            if (markers.length >= 2) {
+                var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Replace this with your Mapbox access token
+                var waypoints = markers.map(marker => marker.getLatLng());
+                var waypointsStr = waypoints.map(point => point.lng + ',' + point.lat).join(';');
+                var url = `https://api.mapbox.com/directions/v5/mapbox/driving/${waypointsStr}?geometries=geojson&access_token=${accessToken}`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        var route = data.routes[0].geometry;
+                        L.geoJSON(route, { color: 'blue' }).addTo(map);
+                    });
+            }
+        }
+
+        function onMapClick(e) {
+            var clickedCoordinates = e.latlng;
+            var marker = L.marker(clickedCoordinates).addTo(map)
+                .bindPopup('You clicked at ' + clickedCoordinates.toString())
+                .openPopup();
+            markers.push(marker);
+            drawRoute();
+        }
+
+        map.on('click', onMapClick);
+
+        // Add the initial marker to the center
+        var centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+            .bindPopup('This is the center marker')
+            .openPopup();
+        markers.push(centerMarker);
+
+        // Add the map scale control
+        L.control.scale().addTo(map);
+
+
+
+
+</script>
+
+
+</div>
+
+
+{% endblock  %}
