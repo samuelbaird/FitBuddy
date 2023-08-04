@@ -1,0 +1,13 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Your Workout Templates</h1>
+
+{% for workout in workouts %}
+<div class="card">
+  <a href="{% url 'workouts_detail' workout.id %}">
+    <div class="card-content">
+      <span class="card-title">{{ workout.name }}</span>
+    </div>
+  </a>
+</div>
+{% endfor %} {% endblock %}

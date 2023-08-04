@@ -1,0 +1,313 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  #workout-exercises li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  #workout-exercises label {
+    margin-right: 10px;
+  }
+
+  #workout-exercises li span[data-attribute] {
+    padding: 5px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    margin-right: 5px;
+    border-radius: 5px;
+  }
+</style>
+
+<div class="container">
+  {% if form.instance.pk %}
+    <h1>Edit {{ workout_name }}</h1>
+  {% else %}
+    <h1>Create a New Workout</h1>
+  {% endif %}
+  <form action="{% url 'workout_create' %}" method="POST">
+    {% csrf_token %}
+    <div class="input-field">
+      <label for="id_name">Workout Name:</label>
+      <input type="text" id="id_name" name="name" value="{{ form.instance.name }}" required />
+    </div>
+
+    <ul id="workout-exercises"></ul>
+    <input type="hidden" id="exercises-input" name="exercises" />
+
+    <div class="input-field">
+      <input
+        type="text"
+        id="autocomplete-input"
+        class="autocomplete"
+        placeholder="Start typing exercise name..."
+      />
+      <label for="autocomplete-input">Add Exercise to Workout</label>
+    </div>
+
+    <button type="button" id="add-exercise-btn" class="btn">
+      Add Exercise
+    </button>
+    <input type="submit" value="Submit" class="btn" />
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('add-exercise-btn').addEventListener('click', addExerciseToWorkout);
+    const exerciseData = {
+      {% for exercise in exercise_list %}
+      "{{ exercise.name }}": "{{ exercise.id }}",
+      {% endfor %}
+    };
+
+    console.log('exerciseData:', exerciseData);
+
+    var elems = document.querySelectorAll('.autocomplete');
+    var instances = M.Autocomplete.init(elems, {
+      data: exerciseData,
+      minLength: 1,
+    });
+
+    const workoutExercisesList = document.getElementById('workout-exercises');
+    const exercisesInput = document.getElementById('exercises-input');
+
+function addExerciseToWorkout() {
+  const autocompleteInput = document.getElementById('autocomplete-input');
+  const exerciseName = autocompleteInput.value.trim();
+  if (exerciseName !== '' && exerciseData.hasOwnProperty(exerciseName)) {
+    const exerciseId = exerciseData[exerciseName];
+    console.log('Exercise Name:', exerciseName);
+    console.log('Exercise ID:', exerciseId);
+
+    const exerciseAttributeElement = document.createElement('span');
+    exerciseAttributeElement.setAttribute('data-attribute', 'exercise');
+    exerciseAttributeElement.textContent = exerciseName;
+    const listItem = document.createElement('li');
+    listItem.appendChild(exerciseAttributeElement);
+    workoutExercisesList.appendChild(listItem);
+
+    // Retrieve the current list of exercise IDs from the hidden input value
+    const currentExercises = new Set(exercisesInput.value.split(',').filter(Boolean));
+    console.log('Current Exercises:', currentExercises);
+
+    // Add the new exercise ID to the set
+    currentExercises.add(exerciseId);
+    console.log('Updated Exercises:', currentExercises);
+
+    // Update the hidden input value with the comma-separated list of exercise IDs
+    exercisesInput.value = [...currentExercises].join(',');
+    console.log('Updated Value:', exercisesInput.value);
+
+    autocompleteInput.value = ''; // Clear the input field
+  }
+}
+
+
+  });
+</script>
+
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const exerciseData = {
+        {% for exercise in exercise_list %}
+        "{{ exercise.name }}": "{{ exercise.id }}",
+        {% endfor %}
+      };
+
+      var elems = document.querySelectorAll('.autocomplete');
+      var instances = M.Autocomplete.init(elems, {
+        data: exerciseData,
+        minLength: 1,
+      });
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+  event.preventDefault(); // Prevent the form from submitting initially
+
+  // Update the hidden input with the selected exercise IDs as a comma-separated string
+  document.getElementById('exercises-input').value = selectedExercises.join(',');
+
+  // Proceed with the form submission manually
+  this.submit();
+});
+
+
+      const addExerciseButton = document.getElementById('add-exercise-btn');
+      const inputElement = document.getElementById('autocomplete-input');
+      const workoutExercisesList = document.getElementById('workout-exercises');
+
+      let weightInput, setsInput, repsInput, tempoInput, restInput;
+
+          let selectedExercises = [];
+
+      function addExerciseToForm(exerciseId) {
+        selectedExercises.push(exerciseId);
+      }
+
+      function removeExerciseFromForm(exerciseId) {
+        selectedExercises = selectedExercises.filter((id) => id !== exerciseId);
+      }
+
+      function updateFormExercises() {
+        const exercisesInput = document.getElementById('exercises-input');
+        exercisesInput.value = selectedExercises.join(',');
+
+        const selectedExercisesList = document.getElementById('workout-exercises');
+        selectedExercisesList.innerHTML = '';
+        selectedExercises.forEach((exerciseId) => { // Use the IDs to display exercise names
+         const exercise = exerciseData[exerciseId];
+         const listItem = document.createElement('li');
+         listItem.textContent = exercise;
+         selectedExercisesList.appendChild(listItem);
+    });
+      }
+
+      function createExerciseElement(selectedExercise) {
+        const exerciseItem = document.createElement('li');
+        exerciseItem.textContent = selectedExercise;
+
+        const weightLabel = createLabel('Weight:');
+        weightInput = createInput('number');
+        weightInput.name = 'weight_${selectedExercise}';
+        const setsLabel = createLabel('Sets:');
+        setsInput = createInput('number');
+        setsInput.name = 'sets_${selectedExercise}';
+        const repsLabel = createLabel('Reps:');
+        repsInput = createInput('number');
+        repsInput.name = 'reps_${selectedExercise}';
+        const tempoLabel = createLabel('Tempo:');
+        tempoInput = createInput('text');
+        tempoInput.name = 'tempo_${selectedExercise}';
+        const restLabel = createLabel('Rest:');
+        restInput = createInput('text');
+        restInput.name = 'rest_${selectedExercise}';
+
+        exerciseItem.appendChild(weightLabel);
+        exerciseItem.appendChild(weightInput);
+        exerciseItem.appendChild(setsLabel);
+        exerciseItem.appendChild(setsInput);
+        exerciseItem.appendChild(repsLabel);
+        exerciseItem.appendChild(repsInput);
+        exerciseItem.appendChild(tempoLabel);
+        exerciseItem.appendChild(tempoInput);
+        exerciseItem.appendChild(restLabel);
+        exerciseItem.appendChild(restInput);
+
+        weightInput.style.display = 'none';
+        setsInput.style.display = 'none';
+        repsInput.style.display = 'none';
+        tempoInput.style.display = 'none';
+        restInput.style.display = 'none';
+
+        const weightSpan = createSpan('weight');
+        const setsSpan = createSpan('sets');
+        const repsSpan = createSpan('reps');
+        const tempoSpan = createSpan('tempo');
+        const restSpan = createSpan('rest');
+
+        exerciseItem.appendChild(weightSpan);
+        exerciseItem.appendChild(setsSpan);
+        exerciseItem.appendChild(repsSpan);
+        exerciseItem.appendChild(tempoSpan);
+        exerciseItem.appendChild(restSpan);
+
+        return exerciseItem;
+      }
+
+      function createSpan(attribute) {
+        const span = document.createElement('span');
+        span.setAttribute('data-attribute', attribute);
+        return span;
+      }
+
+      function createLabel(text) {
+        const label = document.createElement('label');
+        label.textContent = text;
+        return label;
+      }
+
+      function createInput(type) {
+        const input = document.createElement('input');
+        input.type = type;
+        return input;
+      }
+
+      function showInputFields(exerciseItem) {
+        const labels = exerciseItem.querySelectorAll('label');
+        const spans = exerciseItem.querySelectorAll('span[data-attribute]');
+        const inputs = exerciseItem.querySelectorAll('input');
+
+        labels.forEach((label) => (label.style.display = ''));
+        spans.forEach((span) => (span.style.display = 'none'));
+        inputs.forEach((input) => (input.style.display = ''));
+      }
+
+      function showSavedValues(exerciseItem) {
+        const labels = exerciseItem.querySelectorAll('label');
+        const spans = exerciseItem.querySelectorAll('span[data-attribute]');
+        const inputs = exerciseItem.querySelectorAll('input');
+
+        labels.forEach((label) => (label.style.display = 'none'));
+        spans.forEach((span) => (span.style.display = ''));
+        inputs.forEach((input) => (input.style.display = 'none'));
+      }
+
+      addExerciseButton.addEventListener('click', function () {
+  const selectedExerciseName = inputElement.value.trim();
+  if (selectedExerciseName) {
+    const selectedExerciseId = Object.keys(exerciseData).find(
+      (key) => exerciseData[key] === selectedExerciseName
+    );
+
+    if (selectedExerciseId) {
+      const exerciseItem = createExerciseElement(selectedExerciseId);
+      workoutExercisesList.appendChild(exerciseItem);
+      addExerciseToForm(selectedExerciseId); 
+      updateFormExercises(); 
+      inputElement.value = '';
+    }
+  }
+});
+
+
+      function updateFormExercises() {
+    const exercisesInput = document.getElementById('exercises-input');
+    exercisesInput.value = selectedExercises.join(',');
+
+    const selectedExercisesList = document.getElementById('workout-exercises');
+    selectedExercisesList.innerHTML = '';
+    selectedExercises.forEach((exercise) => {
+      const listItem = document.createElement('li');
+      listItem.textContent = exercise;
+      selectedExercisesList.appendChild(listItem);
+    });
+  }
+
+      function createButton(text) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.type = 'button';
+        return button;
+      }
+
+     addExerciseButton.addEventListener('click', function () {
+  const selectedExerciseName = inputElement.value.trim();
+  if (selectedExerciseName) {
+    const selectedExerciseId = Object.keys(exerciseData).find(
+      (key) => exerciseData[key] === selectedExerciseName
+    );
+
+    if (selectedExerciseId) {
+      const exerciseItem = createExerciseElement(selectedExerciseId);
+      workoutExercisesList.appendChild(exerciseItem);
+      addExerciseToForm(selectedExerciseId); // Add the exercise ID to the selectedExercises array
+      updateFormExercises(); // Update the hidden input with the selected exercise IDs
+      inputElement.value = '';
+    }
+  }
+});
+    });
+</script>
+
+{% endblock %} -->

@@ -114,3 +114,27 @@ class ImportedExercise(models.Model):
 
      def __str__(self):
         return f'{self.name} ({self.id})'
+     
+class Workout(models.Model):
+  name = models.CharField(max_length=100)
+  exercises = models.ManyToManyField('ImportedExercise', through='ExerciseInWorkout')
+
+  def __str__(self):
+    return f'{self.name} ({self.id})'
+  
+  def get_absolute_url(self):
+    return reverse('workouts_detail', kwargs={'pk': self.id})
+  
+  
+
+class ExerciseInWorkout(models.Model):
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(ImportedExercise, on_delete=models.CASCADE)
+    sets = models.IntegerField(null=True, blank=True)
+    weight = models.IntegerField(null=True, blank=True)
+    reps = models.IntegerField(null=True, blank=True)
+    tempo = models.CharField(max_length=10, null=True, blank=True)
+    rest = models.CharField(max_length=10, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.exercise} in {self.workout}"
