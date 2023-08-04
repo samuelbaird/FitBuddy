@@ -57,6 +57,7 @@ def muscle_index(request, muscle):
   exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
   for exercise in exercises:
      exercise.images = eval(exercise.images)
+     exercise.name = exercise.name.replace('/', '-')
   context = {
       'muscle_name': muscle,
       'exercises': exercises,
