@@ -1,30 +1,30 @@
-<!-- templates/workouts/detail.html -->
 {% extends 'base.html' %}
 {% block content %}
 
 <div class="row">
-  <div class="col s6">
-    <div class="card">
-      <div class="card-content">
+  <div class="col s12 m6">
+    <div class="card blue-grey darken-1">
+      <div class="card-content blue-grey-text darken-1">
         <span class="card-title">{{ workout.name }}</span>
-        <!-- Display related through table records -->
-        <ul>
+        <ul class="collection" id="workout-exercises">
           {% for exercise_in_workout in exercise_in_workouts %}
-            <li>
-              {{ exercise_in_workout.exercise.name }} - 
-              Sets: {{ exercise_in_workout.sets }},
-              Weight: {{ exercise_in_workout.weight }},
-              Reps: {{ exercise_in_workout.reps }},
-              Tempo: {{ exercise_in_workout.tempo }},
-              Rest: {{ exercise_in_workout.rest }}
+            <li class="collection-item avatar">
+              <i class="material-icons circle green">fitness_center</i>
+              <span class="title">{{ exercise_in_workout.exercise.name }}</span>
+              <p>
+                <label>Sets:</label><span data-attribute><strong>{{ exercise_in_workout.sets }}</strong></span><br>
+                <label>Weight:</label><span data-attribute><strong>{{ exercise_in_workout.weight }}</strong></span><br>
+                <label>Reps:</label><span data-attribute><strong>{{ exercise_in_workout.reps }}</strong></span><br>
+                <label>Tempo:</label><span data-attribute><strong>{{ exercise_in_workout.tempo }}</strong></span><br>
+                <label>Rest:</label><span data-attribute><strong>{{ exercise_in_workout.rest }}</strong></span>
+              </p>
             </li>
           {% endfor %}
         </ul>
       </div>
-
       <div class="card-action">
-        <a href="{% url 'workout_update' workout.id %}">Edit</a>
-        <a href="{% url 'workout_delete' workout.id %}">Delete</a>
+        <a href="{% url 'workout_update' workout.id %}" class="waves-effect waves-light btn-small blue">Edit</a>
+        <a href="{% url 'workout_delete' workout.id %}" class="waves-effect waves-light btn-small red">Delete</a>
       </div>
     </div>
   </div>
