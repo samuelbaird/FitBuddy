@@ -7,7 +7,9 @@
   <div class="col s6">
     <div class="card">
       <div class="card-image">
-        <img src="{{ exercise.images }}">
+        {% for image in exercise.images %}
+        <img style="height: 10rem;" src="../../static/exercises_images/{{ image }}">
+        {% endfor %}
       </div>
     </div>
   </div>
@@ -29,30 +31,6 @@
     </div>
   </div>
 </div>
-
-
-
-
-
-
-
-    {% comment %} <div class="col s6">
-      <div class="card">
-        <div class="card-image">
-          <img src="{{ exercise.images }}">
-        </div>
-      </div>
-    </div>
-  </div>
-    <div class="col s6">
-      <div class="card">
-        <div class="card-content">
-          <h6>Instructions</h6>
-          <p>{{ exercise.instructions }}</p>
-        </div>
-      </div>
-    </div>
- {% endcomment %}
 
 
 {% endblock content %}
