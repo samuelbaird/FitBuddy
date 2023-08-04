@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -176,26 +177,65 @@ def create_workout(request):
         form = WorkoutForm(request.POST)
         if form.is_valid():
             print('form is valid')
-            workout = form.save()
+            workout = form.save(commit=False)
 
-            exercise_ids = request.POST.getlist('exercises')  
-
+            exercise_ids = request.POST.get('exercises').split(',')
+            all_exercises_valid = True
+            exercises_in_workout = []
             for exercise_id in exercise_ids:
                 exercise = ImportedExercise.objects.get(pk=int(exercise_id))
                 exercise_in_workout = ExerciseInWorkout(workout=workout, exercise=exercise)
  
-                exercise_in_workout.sets = request.POST.get(f'sets_{exercise_id}')
-                exercise_in_workout.weight = request.POST.get(f'weight_{exercise_id}')
-                exercise_in_workout.reps = request.POST.get(f'reps_{exercise_id}')
-                exercise_in_workout.tempo = request.POST.get(f'tempo_{exercise_id}')
-                exercise_in_workout.rest = request.POST.get(f'rest_{exercise_id}')
-                exercise_in_workout.save()
+                sets = request.POST.get(f'sets_{exercise_id}')
+                if sets and (not sets.isdigit() or int(sets) < 0):
+                    all_exercises_valid = False
+                    form.add_error(None, f'Invalid sets for exercise {exercise.name}')
+                elif sets:
+                    exercise_in_workout.sets = sets
+                
+                weight = request.POST.get(f'weight_{exercise_id}')
+                if weight and (not weight.isdigit() or int(weight) < 0):
+                    all_exercises_valid = False
+                    form.add_error(None, f'Invalid weight for exercise {exercise.name}')
+                elif weight:
+                    exercise_in_workout.weight = weight
 
-            return redirect('workouts_detail', pk=workout.pk)
-    else:
-        print('form is not valid')
-        form = WorkoutForm()
+                reps = request.POST.get(f'reps_{exercise_id}')
+                if reps and (not reps.isdigit() or int(reps) < 0):
+                    all_exercises_valid = False
+                    form.add_error(None, f'Invalid reps for exercise {exercise.name}')
+                elif reps:
+                    exercise_in_workout.reps = reps
+                tempo = request.POST.get(f'tempo_{exercise_id}')
+                if tempo and not re.match(r'^[\w-]+$', tempo):
+                    all_exercises_valid = False
+                    form.add_error(None, f'Invalid tempo for exercise {exercise.name}')
+                elif tempo:
+                    exercise_in_workout.tempo = tempo
 
+                rest = request.POST.get(f'rest_{exercise_id}')
+                if rest and not re.match(r'^[\w-]+$', rest):
+                    all_exercises_valid = False
+                    form.add_error(None, f'Invalid rest for exercise {exercise.name}')
+                elif rest:
+                    exercise_in_workout.rest = rest
+                
+                if all_exercises_valid:
+                    exercises_in_workout.append(exercise_in_workout)
+
+            if all_exercises_valid:
+                workout.save()
+                for exercise_in_workout in exercises_in_workout:
+                    exercise_in_workout.save()
+
+                return redirect('workouts_detail', pk=workout.pk)
+            else:
+                messages.error(request, 'Some fields are not valid. Please check your entries.')
+        else:
+            print('form is not valid')
+            print(form.errors)
+
+    form = WorkoutForm()
     exercise_list = ImportedExercise.objects.all()
     return render(request, 'workouts/workout_form.html', {'form': form, 'exercise_list': exercise_list})
 
