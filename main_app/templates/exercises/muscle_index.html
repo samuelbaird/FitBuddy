@@ -10,11 +10,13 @@
       <div class="col s4">
         <div class="card">
           <div class="card-image">
-            <img src="{{ exercise.images }}">
+            {% for image in exercise.images %}
+              {% if forloop.counter0 == 0 %}
+                <img src="../../static/exercises_images/{{ image }}">
+              {% endif %}
+            {% endfor %}
             <div class="card-action">
-              {% comment %} <a href="/exercises/{{ exercise.id }}">{{ exercise.name }}</a> {% endcomment %}
               <a href="{% url 'muscle_exercise_detail' exercise.name exercise.id  %}">{{ exercise.name }}</a>
-              {% comment %} <a href="{% url 'detail' exercise.id %}">{{ exercise.name }}</a> {% endcomment %}
             </div>
           </div>
         </div>
