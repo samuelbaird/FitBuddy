@@ -60,6 +60,7 @@
   </nav>
   <ul class="sidenav" id="mobile-demo">
     {% if user.is_authenticated %}
+    <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'user_exercises' %}">View Your Exercises</a></li>
     <li><a href="{% url 'exercises_index' %}">Exercise Database</a></li>
     <li><a href="{% url 'exercises_form' %}">New Exercise</a></li>
@@ -69,7 +70,7 @@
     {% else %}
     <li><a href="{% url 'signup' %}">Sign Up</a></li>
     <li><a href="{% url 'login' %}">Log In</a></li>
-  {% endif %}
+    {% endif %}
   </ul>
 
   </header>
