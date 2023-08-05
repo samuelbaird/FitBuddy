@@ -14,7 +14,26 @@ import json
 # API-key = gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5
 # Create your views here.
 def home(request):
-  return render(request, 'home.html')
+  if request.method == 'GET':
+    api_url = 'https://api.api-ninjas.com/v1/quotes?category=dad'
+    api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
+    try:
+      api_data = json.loads(api_request.content)
+      if api_data and isinstance(api_data, list) and len(api_data) > 0:
+        quote_info = api_data[0]
+        quote = quote_info['quote']
+        author = quote_info['author']
+      else:
+        quote = "No quotes available in the given category."
+        author = "Unknown"
+
+    except Exception as e:
+      quote = "Oops, There was an error"
+      author = "Unknown"
+      print(e)
+
+  return render(request, 'home.html', {'quote': quote, 'author': author})
+
 
 def about(request):
   return render(request, 'about.html')
@@ -42,15 +61,6 @@ def exercises_index(request):
   return render(request, 'exercises/exercises_index.html', {
     'categorized_exercises_dict': categorized_exercises_dict
   })
-  # if request.method == 'GET':
-  #   api_url = 'https://api.api-ninjas.com/v1/exercises?muscles='
-  #   api_request = requests.get(api_url, headers={'X-Api-Key': 'gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5'})
-  #   try:
-  #     api = json.loads(api_request.content)
-  #     # print(api_request.content)
-  #   except Exception as e:
-  #     api = "Opps, There was an error"
-  #     print(e)
 
 @login_required
 def muscle_index(request, muscle):
