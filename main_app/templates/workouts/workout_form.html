@@ -35,13 +35,8 @@
       {% endif %}
     </ul>
 
-    <input type="hidden" id="exercises-input" name="exercises" value="
-      {% if form.instance.pk %}
-          {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
-              {% if not forloop.first %},{% endif %}{{ exercise_in_workout.exercise.id }}
-          {% endfor %}
-      {% endif %}
-"/>
+<input type="hidden" id="exercises-input" name="exercises" value="{% if form.instance.pk %}{% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}{{ exercise_in_workout.exercise.id }} {% endfor %}{% endif %}">
+
 
     <div class="row">
         <div class="input-field col s12">
@@ -113,7 +108,7 @@
     const currentExercises = new Set(exercisesInput.value.split(',').filter(Boolean));
     currentExercises.delete(exerciseId);
 
-    exercisesInput.value = [...currentExercises].join(',');
+    exercisesInput.value = [...currentExercises].filter(id => !!id).join(',');
   }
 
 function addExerciseToWorkout() {
@@ -179,7 +174,7 @@ function addExerciseToWorkout() {
 
     currentExercises.add(exerciseId);
 
-    exercisesInput.value = [...currentExercises].join(',');
+    exercisesInput.value = [...currentExercises].filter(id => !!id).join(',');
 
     autocompleteInput.value = ''; 
     setsInput.value = '';
