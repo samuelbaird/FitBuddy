@@ -10,13 +10,13 @@
         <div class="card">
           <div class="card-image indigo">
             <li style="font-size: 20px"> <span class="white-text">  Name: </span> {{ exercise.name }}</li> 
-            <li style="font-size: 20px"><span class="white-text">Force: </span> {{ exercise.force }}</li>
+            {% comment %} <li style="font-size: 20px"><span class="white-text">Force: </span> {{ exercise.force }}</li> {% endcomment %}
             <li style="font-size: 20px"><span class="white-text">Level: </span> {{ exercise.level }}</li>
-            <li style="font-size: 20px"><span class="white-text">Mechanic: </span> {{ exercise.mechanic }}</li>
-            <li style="font-size: 20px"><span class="white-text">Equipment: </span> {{ exercise.equipment }}</li>
+            {% comment %} <li style="font-size: 20px"><span class="white-text">Mechanic: </span> {{ exercise.mechanic }}</li> {% endcomment %}
+            {% comment %} <li style="font-size: 20px"><span class="white-text">Equipment: </span> {{ exercise.equipment }}</li> {% endcomment %}
             <li style="font-size: 20px"><span class="white-text"> Primary Muscles: </span> {{ exercise.primaryMuscles }} </li>
-            <li style="font-size: 20px"> <span class="white-text"> Secondary Muscles: </span> {{ exercise.secondaryMuscles }} </li>
-            <li style="font-size: 20px"> <span class="white-text"> Category: </span> {{ exercise.category }}</li>
+            {% comment %} <li style="font-size: 20px"> <span class="white-text"> Secondary Muscles: </span> {{ exercise.secondaryMuscles }} </li> {% endcomment %}
+            {% comment %} <li style="font-size: 20px"> <span class="white-text"> Category: </span> {{ exercise.category }}</li> {% endcomment %}
             <li style="font-size: 20px"><span class="white-text"> Images: </span> {{ exercise.images }}</li>
             <li style="font-size: 20px"> <span class="white-text"> Instructions: </span> {{ exercise.instructions }} </li>
             
