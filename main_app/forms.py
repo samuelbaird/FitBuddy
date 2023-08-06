@@ -1,8 +1,9 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Exercise, Profile, Workout
+from .models import Exercise, Profile, Workout, DIFFICULTY
 
 class ExerciseForm(forms.ModelForm):
+    level = forms.ChoiceField(choices=DIFFICULTY)
     class Meta:
         model = Exercise
         fields = ['name', 'level', 'primaryMuscles', 'images', 'instructions']
