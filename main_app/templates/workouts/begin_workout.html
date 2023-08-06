@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>{{ workout.name }}</h1>
+
+    <form action="{% url 'begin_workout' form.instance.pk %}" method="POST">
+    {% csrf_token %}
+
+    <div id="workout-exercises">
+      {% if form.instance.pk %}
+        {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
+        <div class="card blue-grey darken-1">
+          <div class="card-content white-text">
+            <span class="card-title">{{ exercise_in_workout.exercise.name }}</span>
+            <div class="row">
+              <div class="col s2 input-field">
+                <input type="number" name="sets_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.sets }}" placeholder="Sets..." class="white-text"/>
+                <label>Sets</label>
+              </div>
+              <div class="col s2 input-field">
+                <input type="number" name="weight_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.weight }}" placeholder="Weight..." class="white-text"/>
+                <label>Weight</label>
+              </div>
+              <div class="col s2 input-field">
+                <input type="number" name="reps_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.reps }}" placeholder="Reps..." class="white-text"/>
+                <label>Reps</label>
+              </div>
+              <div class="col s2 input-field">
+                <input type="text" name="tempo_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.tempo }}" placeholder="Tempo..." class="white-text"/>
+                <label>Tempo</label>
+              </div>
+              <div class="col s2 input-field">
+                <input type="number" name="rest_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.rest }}" placeholder="Rest time..." class="white-text"/>
+                <label>Rest Time</label>
+              </div>
+            </div>
+          </div>
+          <div class="card-action">
+            <button type="button" class="delete-exercise-btn btn waves-effect waves-light red">Delete</button>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <input type="submit" value="Submit" class="btn" />
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('add-exercise-btn').addEventListener('click', addExerciseToWorkout);
+    const deleteExerciseButtons = document.querySelectorAll('.delete-exercise-btn');
+    deleteExerciseButtons.forEach(button => button.addEventListener('click', deleteExercise));
+    const exerciseData = {
+      {% for exercise in exercise_list %}
+      "{{ exercise.name }}": "{{ exercise.id }}",
+      {% endfor %}
+    };
+
+    console.log('exerciseData:', exerciseData);
+
+    var elems = document.querySelectorAll('.autocomplete');
+    var instances = M.Autocomplete.init(elems, {
+      data: exerciseData,
+      minLength: 1,
+    });
+
+    const workoutExercisesList = document.getElementById('workout-exercises');
+    const exercisesInput = document.getElementById('exercises-input');
+
+  function deleteExercise(e) {
+    const listItem = e.target.closest('li');
+    const exerciseId = listItem.getAttribute('data-exercise-id');
+
+    workoutExercisesList.removeChild(listItem);
+
+    const currentExercises = new Set(exercisesInput.value.split(',').filter(Boolean));
+    currentExercises.delete(exerciseId);
+
+    exercisesInput.value = [...currentExercises].join(',');
+  }
+
+function addExerciseToWorkout() {
+  const autocompleteInput = document.getElementById('autocomplete-input');
+  const setsInput = document.getElementById('sets-input');
+  const weightInput = document.getElementById('weight-input');
+  const repsInput = document.getElementById('reps-input');
+  const tempoInput = document.getElementById('tempo-input');
+  const restInput = document.getElementById('rest-input');
+
+  const exerciseName = autocompleteInput.value.trim();
+  const sets = setsInput.value.trim();
+  const weight = weightInput.value.trim();
+  const reps = repsInput.value.trim();
+  const tempo = tempoInput.value.trim();
+  const rest = restInput.value.trim();
+
+  if (exerciseName !== '' && exerciseData.hasOwnProperty(exerciseName)) {
+    const exerciseId = exerciseData[exerciseName];
+
+    const listItem = document.createElement('li');
+
+    const exerciseAttributeElement = document.createElement('span');
+    exerciseAttributeElement.setAttribute('data-attribute', 'exercise');
+    exerciseAttributeElement.textContent = exerciseName;
+    listItem.appendChild(exerciseAttributeElement);
+
+    const setsElement = document.createElement('span');
+    setsElement.setAttribute('data-attribute', 'sets');
+    setsElement.textContent = 'Sets: ' + sets;
+    listItem.appendChild(setsElement);
+
+    const weightElement = document.createElement('span');
+    weightElement.setAttribute('data-attribute', 'weight');
+    weightElement.textContent = 'Weight: ' + weight;
+    listItem.appendChild(weightElement);
+
+    const repsElement = document.createElement('span');
+    repsElement.setAttribute('data-attribute', 'reps');
+    repsElement.textContent = 'Reps: ' + reps;
+    listItem.appendChild(repsElement);
+
+    const tempoElement = document.createElement('span');
+    tempoElement.setAttribute('data-attribute', 'tempo');
+    tempoElement.textContent = 'Tempo: ' + tempo;
+    listItem.appendChild(tempoElement);
+
+    const restElement = document.createElement('span');
+    restElement.setAttribute('data-attribute', 'rest');
+    restElement.textContent = 'Rest: ' + rest;
+    listItem.appendChild(restElement);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'delete-exercise-btn';
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', deleteExercise);
+    listItem.appendChild(deleteButton);
+
+    workoutExercisesList.appendChild(listItem);
+
+    const currentExercises = new Set(exercisesInput.value.split(',').filter(Boolean));
+
+    currentExercises.add(exerciseId);
+
+    exercisesInput.value = [...currentExercises].join(',');
+
+    autocompleteInput.value = ''; 
+    setsInput.value = '';
+    weightInput.value = '';
+    repsInput.value = '';
+    tempoInput.value = '';
+    restInput.value = '';
+  }
+}
+  });
+</script>
+{% endblock %}

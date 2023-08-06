@@ -23,6 +23,7 @@
         </ul>
       </div>
       <div class="card-action">
+        <a href="{% url 'begin_workout' workout.id %}" class="waves-effect waves-light btn-small">Begin Workout</a>
         <a href="{% url 'workout_update' workout.id %}" class="waves-effect waves-light btn-small blue">Edit</a>
         <a href="{% url 'workout_delete' workout.id %}" class="waves-effect waves-light btn-small red">Delete</a>
       </div>
