@@ -19,6 +19,7 @@
         </ul>
       </div>
       <div class="card-action">
+        <a href="{% url 'workouts_history' %}" class="waves-effect waves-light btn-small blue">History</a>
         <a href="{% url 'profiles_update' profile.id %}" class="waves-effect waves-light btn-small blue">Edit</a>
         <a href="{% url 'profiles_delete' profile.id %}" class="waves-effect waves-light btn-small red">Delete</a>
       </div>

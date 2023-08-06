@@ -393,3 +393,10 @@ def begin_workout(request, pk):
             'exercise_in_workouts': exercise_in_workouts,
             'form': form
         })
+
+@login_required
+def workouts_history(request):
+    workouts = Workout.objects.filter(user=request.user, is_template=False).order_by('-date')
+    return render(request, 'workouts/history.html', {
+        'workouts': workouts
+    })
