@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <div id="map" style="height: 400px;"></div>
+    <div id="map" style="height: 600px;"></div>
     <input type="text" id="address" placeholder="Enter an address">
     <button onclick="setStartPoint()">Set Start Point</button>
     <button onclick="savePoints()">Save Points</button>
@@ -116,15 +116,16 @@
         }
 
         function onMapClick(e) {
-            if (markers.length < maxPoints) {
-                var clickedCoordinates = e.latlng;
-                var marker = L.marker(clickedCoordinates).addTo(map)
-                    .bindPopup('You clicked at ' + clickedCoordinates.toString())
-                    .openPopup();
-                markers.push(marker);
-                drawRoute();
-            }
-        }
+    if (markers.length < maxPoints) {
+        var clickedCoordinates = e.latlng;
+        var pointNumber = markers.length + 1; // Start numbering from 1
+        var marker = L.marker(clickedCoordinates).addTo(map)
+            .bindPopup('Point ' + pointNumber + ': You stopped here '  )
+            .openPopup();
+        markers.push(marker);
+        drawRoute();
+    }
+}
 
         function setStartPoint() {
             var address = document.getElementById('address').value;
@@ -167,27 +168,29 @@
         }
 
         function clearMarkers(keepCenterMarker = false) {
-            if (!keepCenterMarker) {
-                map.removeLayer(centerMarker);
-                centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
-                    .bindPopup('Route Start')
-                    .openPopup();
-                markers = [centerMarker];
-            } else {
-                markers.forEach(marker => {
-                    if (marker !== centerMarker) {
-                        map.removeLayer(marker);
-                    }
-                });
-                markers = [centerMarker];
+    if (!keepCenterMarker) {
+        map.removeLayer(centerMarker);
+        centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+            .bindPopup('Route Start')
+            .openPopup();
+        markers = [centerMarker];
+    } else {
+        markers.forEach((marker, index) => {
+            if (marker !== centerMarker) {
+                map.removeLayer(marker);
+                // Renumber the points if needed
+                marker.setPopupContent('Point ' + (index + 1));
             }
+        });
+        markers = [centerMarker];
+    }
 
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-                routeLayer = null;
-            }
-            updateDistance();
-        }
+    if (routeLayer) {
+        map.removeLayer(routeLayer);
+        routeLayer = null;
+    }
+    updateDistance();
+}
 
         function deletePoints() {
             clearMarkers(true); // Pass "true" to keep the center marker
