@@ -8,6 +8,7 @@
     <button onclick="savePoints()">Save Points</button>
     <button onclick="loadPoints()">Load Points</button>
     <button onclick="deletePoints()">Delete Points</button>
+    <div id="distance-info"></div>
 
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -15,7 +16,7 @@
     <script>
         var map;
         var markers = [];
-        var maxPoints = 2;
+        var maxPoints = 20;
         var routeLayer;
         var centerMarker;
 
@@ -32,6 +33,17 @@
             setupEventListeners();
             L.control.scale().addTo(map);
             L.control.measure({ position: 'topleft', primaryLengthUnit: 'kilometers', secondaryLengthUnit: 'miles', primaryAreaUnit: undefined, secondaryAreaUnit: undefined }).addTo(map);
+
+            // Add click event listener to each marker to remove it when clicked
+            markers.forEach(marker => {
+                marker.on('click', () => {
+                    if (markers.length > 2) {
+                        map.removeLayer(marker);
+                        markers = markers.filter(m => m !== marker);
+                        drawRoute();
+                    }
+                });
+            });
         }
 
         function addCenterMarker() {
@@ -61,25 +73,23 @@
         }
 
         function updateDistance() {
-    if (markers.length >= 2) {
-        var latlng1 = markers[0].getLatLng();
-        var latlng2 = markers[1].getLatLng();
-        var distanceMeters = haversineDistance(latlng1, latlng2);
-        var distanceKm = distanceMeters / 1000; // Convert to kilometers
-        var distanceMiles = distanceMeters / 1609.344; // Convert to miles
+            if (markers.length >= 2) {
+                var totalDistanceMeters = 0;
+                for (let i = 0; i < markers.length - 1; i++) {
+                    totalDistanceMeters += haversineDistance(markers[i].getLatLng(), markers[i + 1].getLatLng());
+                }
 
-        centerMarker.setPopupContent('Distance (Metric): ' + distanceKm.toFixed(2) + ' km<br>Distance (Standard): ' + distanceMiles.toFixed(2) + ' miles');
-    } else {
-        centerMarker.setPopupContent('Start route');
-    }
-}
+                var totalDistanceKm = totalDistanceMeters / 1000; // Convert to kilometers
+                var totalDistanceMiles = totalDistanceMeters / 1609.344; // Convert to miles
 
+                document.getElementById('distance-info').innerHTML = 'Total Distance (Metric): ' + totalDistanceKm.toFixed(2) + ' km<br>Total Distance (Standard): ' + totalDistanceMiles.toFixed(2) + ' miles';
+            } else {
+                document.getElementById('distance-info').innerHTML = '';
+            }
+        }
 
         function drawRoute() {
-            if (markers.length === 2) {
-                var latlng1 = markers[0].getLatLng();
-                var latlng2 = markers[1].getLatLng();
-
+            if (markers.length >= 2) {
                 if (routeLayer) {
                     map.removeLayer(routeLayer);
                 }
@@ -101,6 +111,7 @@
                 if (routeLayer) {
                     map.removeLayer(routeLayer);
                 }
+                updateDistance();
             }
         }
 
@@ -134,28 +145,26 @@
         }
 
         function savePoints() {
-    var savedPoints = markers.slice(1).map(marker => ({ // Skip the center marker at index 0
-        lat: marker.getLatLng().lat,
-        lng: marker.getLatLng().lng
-    }));
-    localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
-}
-
+            var savedPoints = markers.map(marker => ({
+                lat: marker.getLatLng().lat,
+                lng: marker.getLatLng().lng
+            }));
+            localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
+        }
 
         function loadPoints() {
-    var savedPointsStr = localStorage.getItem('savedPoints');
-    if (savedPointsStr) {
-        var savedPoints = JSON.parse(savedPointsStr);
-        clearMarkers();
-        savedPoints.forEach(point => {
-            var latlng = L.latLng(point.lat, point.lng);
-            var marker = L.marker(latlng).addTo(map);
-            markers.push(marker);
-        });
-        drawRoute(); // Add this line to draw the route after loading points
-    }
-}
-
+            var savedPointsStr = localStorage.getItem('savedPoints');
+            if (savedPointsStr) {
+                var savedPoints = JSON.parse(savedPointsStr);
+                clearMarkers();
+                savedPoints.forEach(point => {
+                    var latlng = L.latLng(point.lat, point.lng);
+                    var marker = L.marker(latlng).addTo(map);
+                    markers.push(marker);
+                });
+                drawRoute();
+            }
+        }
 
         function clearMarkers(keepCenterMarker = false) {
             if (!keepCenterMarker) {
@@ -177,6 +186,7 @@
                 map.removeLayer(routeLayer);
                 routeLayer = null;
             }
+            updateDistance();
         }
 
         function deletePoints() {
