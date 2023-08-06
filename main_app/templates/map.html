@@ -2,21 +2,90 @@
 
 {% block content %}
 
-<div style="height: 50vh;" id="map">
+    <div id="map" style="height: 400px;"></div>
+    <input type="text" id="address" placeholder="Enter an address">
+    <button onclick="setStartPoint()">Set Start Point</button>
+    <button onclick="savePoints()">Save Points</button>
+    <button onclick="loadPoints()">Load Points</button>
+        
+
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+      <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+      ></script>
+      <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script>
-
- var map = L.map('map').setView([38.9072, -77.0369], 13);
-        map.zoomControl.setPosition('topright');
-
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
+ var map;
+        var map;
         var markers = [];
+        var maxPoints = 2;
+        var routeLayer;
+        var centerMarker;
+
+        function initMap() {
+            map = L.map('map').setView([38.9072, -77.0369], 13);
+            map.zoomControl.setPosition('topright');
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            addCenterMarker();
+            setupEventListeners();
+            L.control.scale().addTo(map);
+            L.control.measure({ position: 'topleft', primaryLengthUnit: 'kilometers', secondaryLengthUnit: 'miles', primaryAreaUnit: undefined, secondaryAreaUnit: undefined }).addTo(map);
+        }
+
+        function addCenterMarker() {
+            centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+                .bindPopup('Route Start')
+                .openPopup();
+            markers.push(centerMarker);
+        }
+
+        function setupEventListeners() {
+            map.on('click', onMapClick);
+        }
+
+        function haversineDistance(latlng1, latlng2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = latlng1.lat * Math.PI / 180;
+            const φ2 = latlng2.lat * Math.PI / 180;
+            const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+            const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+
+            return distance;
+        }
+
+        function updateDistance() {
+            if (markers.length === 2) {
+                var latlng1 = markers[0].getLatLng();
+                var latlng2 = markers[1].getLatLng();
+                var distanceMeters = haversineDistance(latlng1, latlng2);
+                var distanceKm = distanceMeters / 1000; // Convert to kilometers
+                var distanceMiles = distanceMeters / 1609.344; // Convert to miles
+
+                centerMarker.setPopupContent('Distance (Metric): ' + distanceKm.toFixed(2) + ' km<br>Distance (Standard): ' + distanceMiles.toFixed(2) + ' miles');
+            }
+        }
 
         function drawRoute() {
-            if (markers.length >= 2) {
+            if (markers.length === 2) {
+                var latlng1 = markers[0].getLatLng();
+                var latlng2 = markers[1].getLatLng();
+
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
+
                 var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Replace this with your Mapbox access token
                 var waypoints = markers.map(marker => marker.getLatLng());
                 var waypointsStr = waypoints.map(point => point.lng + ',' + point.lat).join(';');
@@ -26,33 +95,78 @@
                     .then(response => response.json())
                     .then(data => {
                         var route = data.routes[0].geometry;
-                        L.geoJSON(route, { color: 'blue' }).addTo(map);
+                        routeLayer = L.geoJSON(route, { color: 'blue' }).addTo(map);
+                        updateDistance();
                     });
+            } else {
+                centerMarker.setPopupContent('Start route');
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
             }
         }
 
         function onMapClick(e) {
-            var clickedCoordinates = e.latlng;
-            var marker = L.marker(clickedCoordinates).addTo(map)
-                .bindPopup('You clicked at ' + clickedCoordinates.toString())
-                .openPopup();
-            markers.push(marker);
-            drawRoute();
+            if (markers.length < maxPoints) {
+                var clickedCoordinates = e.latlng;
+                var marker = L.marker(clickedCoordinates).addTo(map)
+                    .bindPopup('You clicked at ' + clickedCoordinates.toString())
+                    .openPopup();
+                markers.push(marker);
+                drawRoute();
+            }
         }
 
-        map.on('click', onMapClick);
+        function setStartPoint() {
+            var address = document.getElementById('address').value;
+            if (address !== '') {
+                var geocoder = L.Control.Geocoder.nominatim();
+                geocoder.geocode(address, function (results) {
+                    if (results && results.length > 0) {
+                        var latlng = results[0].center;
+                        var startingLatLng = L.latLng(latlng.lat, latlng.lng);
+                        markers[0].setLatLng(startingLatLng);
+                        map.setView(startingLatLng, 13);
+                        centerMarker.setPopupContent('Distance Calculation Starting Address: ' + address);
+                        drawRoute();
+                    }
+                });
+            }
+            return false; // Prevent form submission
+        }
 
-        // Add the initial marker to the center
-        var centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
-            .bindPopup('This is the center marker')
-            .openPopup();
-        markers.push(centerMarker);
+        function savePoints() {
+            var savedPoints = markers.map(marker => ({
+                lat: marker.getLatLng().lat,
+                lng: marker.getLatLng().lng
+            }));
+            localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
+        }
 
-        // Add the map scale control
-        L.control.scale().addTo(map);
+        function loadPoints() {
+            var savedPointsStr = localStorage.getItem('savedPoints');
+            if (savedPointsStr) {
+                var savedPoints = JSON.parse(savedPointsStr);
+                clearMarkers();
+                savedPoints.forEach(point => {
+                    var latlng = L.latLng(point.lat, point.lng);
+                    var marker = L.marker(latlng).addTo(map);
+                    markers.push(marker);
+                });
+                drawRoute();
+            }
+        }
 
+        function clearMarkers() {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+                routeLayer = null;
+            }
+        }
 
-
+        initMap();
 
 </script>
 
