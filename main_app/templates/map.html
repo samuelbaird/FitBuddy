@@ -7,17 +7,12 @@
     <button onclick="setStartPoint()">Set Start Point</button>
     <button onclick="savePoints()">Save Points</button>
     <button onclick="loadPoints()">Load Points</button>
-        
+    <button onclick="deletePoints()">Delete Points</button>
 
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-      <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""
-      ></script>
-      <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<script>
- var map;
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
         var map;
         var markers = [];
         var maxPoints = 2;
@@ -57,8 +52,8 @@
             const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
             const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
             const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             const distance = R * c;
 
@@ -66,16 +61,19 @@
         }
 
         function updateDistance() {
-            if (markers.length === 2) {
-                var latlng1 = markers[0].getLatLng();
-                var latlng2 = markers[1].getLatLng();
-                var distanceMeters = haversineDistance(latlng1, latlng2);
-                var distanceKm = distanceMeters / 1000; // Convert to kilometers
-                var distanceMiles = distanceMeters / 1609.344; // Convert to miles
+    if (markers.length >= 2) {
+        var latlng1 = markers[0].getLatLng();
+        var latlng2 = markers[1].getLatLng();
+        var distanceMeters = haversineDistance(latlng1, latlng2);
+        var distanceKm = distanceMeters / 1000; // Convert to kilometers
+        var distanceMiles = distanceMeters / 1609.344; // Convert to miles
 
-                centerMarker.setPopupContent('Distance (Metric): ' + distanceKm.toFixed(2) + ' km<br>Distance (Standard): ' + distanceMiles.toFixed(2) + ' miles');
-            }
-        }
+        centerMarker.setPopupContent('Distance (Metric): ' + distanceKm.toFixed(2) + ' km<br>Distance (Standard): ' + distanceMiles.toFixed(2) + ' miles');
+    } else {
+        centerMarker.setPopupContent('Start route');
+    }
+}
+
 
         function drawRoute() {
             if (markers.length === 2) {
@@ -136,42 +134,58 @@
         }
 
         function savePoints() {
-            var savedPoints = markers.map(marker => ({
-                lat: marker.getLatLng().lat,
-                lng: marker.getLatLng().lng
-            }));
-            localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
-        }
+    var savedPoints = markers.slice(1).map(marker => ({ // Skip the center marker at index 0
+        lat: marker.getLatLng().lat,
+        lng: marker.getLatLng().lng
+    }));
+    localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
+}
+
 
         function loadPoints() {
-            var savedPointsStr = localStorage.getItem('savedPoints');
-            if (savedPointsStr) {
-                var savedPoints = JSON.parse(savedPointsStr);
-                clearMarkers();
-                savedPoints.forEach(point => {
-                    var latlng = L.latLng(point.lat, point.lng);
-                    var marker = L.marker(latlng).addTo(map);
-                    markers.push(marker);
-                });
-                drawRoute();
-            }
-        }
+    var savedPointsStr = localStorage.getItem('savedPoints');
+    if (savedPointsStr) {
+        var savedPoints = JSON.parse(savedPointsStr);
+        clearMarkers();
+        savedPoints.forEach(point => {
+            var latlng = L.latLng(point.lat, point.lng);
+            var marker = L.marker(latlng).addTo(map);
+            markers.push(marker);
+        });
+        drawRoute(); // Add this line to draw the route after loading points
+    }
+}
 
-        function clearMarkers() {
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
+
+        function clearMarkers(keepCenterMarker = false) {
+            if (!keepCenterMarker) {
+                map.removeLayer(centerMarker);
+                centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+                    .bindPopup('Route Start')
+                    .openPopup();
+                markers = [centerMarker];
+            } else {
+                markers.forEach(marker => {
+                    if (marker !== centerMarker) {
+                        map.removeLayer(marker);
+                    }
+                });
+                markers = [centerMarker];
+            }
+
             if (routeLayer) {
                 map.removeLayer(routeLayer);
                 routeLayer = null;
             }
         }
 
+        function deletePoints() {
+            clearMarkers(true); // Pass "true" to keep the center marker
+            drawRoute();
+        }
+
         initMap();
-
-</script>
-
+    </script>
 
 </div>
-
-
-{% endblock  %}
+{% endblock %}
