@@ -201,6 +201,7 @@ def create_workout(request):
         if form.is_valid():
             print('form is valid')
             workout = form.save(commit=False)
+            workout.is_template = True
 
             exercise_ids = request.POST.get('exercises').split(',')
             all_exercises_valid = True
@@ -272,6 +273,7 @@ def update_workout(request, pk):
         form = WorkoutForm(request.POST, instance=workout)
         print(request.POST)
         if form.is_valid():
+            workout.is_template = True
             print('form is valid')
             form.save()
 
