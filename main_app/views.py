@@ -150,6 +150,7 @@ def signup(request):
   context = {'form': form, 'error_message': error_message}
   return render(request, 'registration/signup.html', context)
 
+@login_required
 class ProfileUpdate(UpdateView):
     model = Profile
     # form_class = ProfileForm
@@ -169,11 +170,12 @@ class ProfileUpdate(UpdateView):
         profile.save()
         return super().form_valid(form)
 
+@login_required
 class ProfileDelete(DeleteView):
     model = Profile
     success_url = '/'
 
-
+@login_required
 class WorkoutDelete(DeleteView):
     model = Workout
     success_url = '/workouts/'
@@ -185,7 +187,7 @@ def workouts_index (request):
         'workouts': workouts
     })
 
-
+@login_required
 def workouts_detail(request, pk):
     workout = Workout.objects.get(id=pk)
     exercise_in_workouts = ExerciseInWorkout.objects.filter(workout=workout)
@@ -194,6 +196,7 @@ def workouts_detail(request, pk):
         'exercise_in_workouts': exercise_in_workouts,
     })
 
+@login_required
 def create_workout(request):
     if request.method == 'POST':
         print(request.POST)
@@ -265,6 +268,7 @@ def create_workout(request):
     exercise_list = ImportedExercise.objects.all()
     return render(request, 'workouts/workout_form.html', {'form': form, 'exercise_list': exercise_list})
 
+@login_required
 def update_workout(request, pk):
     workout = get_object_or_404(Workout, pk=pk)
 
@@ -348,7 +352,6 @@ def update_workout(request, pk):
         'workout_name': workout.name,
     })
 
-
 class ExerciseUpdate(UpdateView):
   model = Exercise
   fields = '__all__'
@@ -357,6 +360,7 @@ class ExerciseDelete(DeleteView):
   model = Exercise
   success_url = '/'  
 
+@login_required
 def begin_workout(request, pk):
     template_workout = get_object_or_404(Workout, pk=pk)
     form = WorkoutForm(instance=template_workout)
