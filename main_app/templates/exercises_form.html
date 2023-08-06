@@ -21,5 +21,26 @@
   </div>
 </div>
 
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    var levelLabel = document.querySelector('label[for="{{ form.level.id_for_label }}"]');
+    var primaryMuscleLabel = document.querySelector('label[for="{{ form.primaryMuscles.id_for_label }}"]');
+
+    if (levelLabel) {
+
+      levelLabel.textContent = 'Difficulty:';
+    }
+
+    if (primaryMuscleLabel) {
+
+      primaryMuscleLabel.textContent = 'Muscle:';
+    }
+  });
+
+  const selectEl = document.getElementById('id_level');
+    M.FormSelect.init(selectEl);
+</script>
   {% endblock %}
   
