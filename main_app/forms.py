@@ -5,7 +5,7 @@ from .models import Exercise, Profile, Workout
 class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
-        fields = '__all__'
+        fields = ['name', 'level', 'primaryMuscles', 'images', 'instructions']
         exclude = ['user']
 
 class ProfileForm(forms.ModelForm):
