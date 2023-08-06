@@ -8,6 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile, Exercise, Workout, ExerciseInWorkout, ImportedExercise
 from .forms import ExerciseForm, ProfileForm, WorkoutForm
 from collections import defaultdict
+from datetime import date
 import requests
 import json
 
@@ -179,10 +180,11 @@ class WorkoutDelete(DeleteView):
 
 @login_required
 def workouts_index (request):
-    workouts = Workout.objects.filter(user=request.user)
+    workouts = Workout.objects.filter(user=request.user, is_template=True)
     return render(request, 'workouts/index.html', {
         'workouts': workouts
     })
+
 
 def workouts_detail(request, pk):
     workout = Workout.objects.get(id=pk)
@@ -355,3 +357,39 @@ class ExerciseDelete(DeleteView):
   model = Exercise
   success_url = '/'  
 
+def begin_workout(request, pk):
+    template_workout = get_object_or_404(Workout, pk=pk)
+    form = WorkoutForm(instance=template_workout)
+    if request.method == 'POST':
+        new_workout = Workout.objects.create(
+            name=template_workout.name,
+            user=template_workout.user,
+            is_template=False,
+            date=date.today()
+        )
+        for e in template_workout.exerciseinworkout_set.all():
+            sets = request.POST.get(f'sets_{e.id}')
+            weight = request.POST.get(f'weight_{e.id}')
+            reps = request.POST.get(f'reps_{e.id}')
+            tempo = request.POST.get(f'tempo_{e.id}')
+            rest = request.POST.get(f'rest_{e.id}')
+
+            ExerciseInWorkout.objects.create(
+                workout=new_workout,
+                exercise=e.exercise,
+                sets=sets,
+                weight=weight,
+                reps=reps,
+                tempo=tempo,
+                rest=rest
+            )
+
+        return redirect(new_workout.get_absolute_url())
+
+    else:
+        exercise_in_workouts = ExerciseInWorkout.objects.filter(workout=template_workout)
+        return render(request, 'workouts/begin_workout.html', {
+            'workout': template_workout,
+            'exercise_in_workouts': exercise_in_workouts,
+            'form': form
+        })
