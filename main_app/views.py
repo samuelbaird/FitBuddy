@@ -41,11 +41,6 @@ def about(request):
 def map(request):
   return render(request, 'map.html')
 
-
-@login_required
-def workouts_index(request):
-  return render(request, 'workouts_index.html')
-
 @login_required
 def exercises_index(request):
   all_exercises = ImportedExercise.objects.all()
