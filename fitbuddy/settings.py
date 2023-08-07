@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-# import django_heroku
+import django_heroku
 import environ
 
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
 env = environ.Env()
 environ.Env.read_env()
 
