@@ -5,21 +5,33 @@
     #map-container {
         height: 400px;
     }
+    .saved-route {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px; /* Adjust the margin as needed for spacing */
+}
+#additional-content {
+  margin-bottom: 20px;
+}
+
 </style>
 <div class="row">
     <div class="col s9" id="map-container">
         <div id="map" style="height: 100%;"></div>
     </div>
     
-        
+    <div class="col s3">
         <div class="card" id="additional-content">
             <!-- Add content for the additional div here -->
             <h5>Plan a Route!</h5>
             <p>Search an address in the input field and press Set Start Point to start planning your route! </p>
-            <p>Feel free to add more content here.</p>
+            <p>After you save your daily route make sure to save and then you can check your progress of the routes you have saved!</p>
         </div>
-    
+    </div>
 </div>
+<div id="saved-routes"></div>
+
+    
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -52,6 +64,7 @@
                         map.removeLayer(marker);
                         markers = markers.filter(m => m !== marker);
                         drawRoute();
+                        updateAdditionalContent();
                     }
                 });
             });
@@ -84,20 +97,28 @@
         }
 
         function updateDistance() {
-            if (markers.length >= 2) {
-                var totalDistanceMeters = 0;
-                for (let i = 0; i < markers.length - 1; i++) {
-                    totalDistanceMeters += haversineDistance(markers[i].getLatLng(), markers[i + 1].getLatLng());
-                }
-
-                var totalDistanceKm = totalDistanceMeters / 1000; // Convert to kilometers
-                var totalDistanceMiles = totalDistanceMeters / 1609.344; // Convert to miles
-
-                document.getElementById('distance-info').innerHTML = 'Total Distance (Metric): ' + totalDistanceKm.toFixed(2) + ' km<br>Total Distance (Standard): ' + totalDistanceMiles.toFixed(2) + ' miles';
-            } else {
-                document.getElementById('distance-info').innerHTML = '';
-            }
+    if (markers.length >= 2) {
+        var totalDistanceMeters = 0;
+        for (let i = 0; i < markers.length - 1; i++) {
+            totalDistanceMeters += haversineDistance(markers[i].getLatLng(), markers[i + 1].getLatLng());
         }
+
+        var totalDistanceKm = totalDistanceMeters / 1000; // Convert to kilometers
+        var totalDistanceMiles = totalDistanceMeters / 1609.344; // Convert to miles
+
+        var distanceInfo = 'Total Distance (Metric): ' + totalDistanceKm.toFixed(2) + ' km<br>Total Distance (Standard): ' + totalDistanceMiles.toFixed(2) + ' miles';
+
+        // Get the saved date if it exists
+        var savedDate = localStorage.getItem('savedDate');
+        if (savedDate) {
+            distanceInfo += '<br>Route Saved on: ' + savedDate;
+        }
+
+        document.getElementById('distance-info').innerHTML = distanceInfo;
+    } else {
+        document.getElementById('distance-info').innerHTML = '';
+    }
+}
 
         function drawRoute() {
             if (markers.length >= 2) {
@@ -139,44 +160,162 @@
 }
 
         function setStartPoint() {
-            var address = document.getElementById('address').value;
-            if (address !== '') {
-                var geocoder = L.Control.Geocoder.nominatim();
-                geocoder.geocode(address, function (results) {
-                    if (results && results.length > 0) {
-                        var latlng = results[0].center;
-                        var startingLatLng = L.latLng(latlng.lat, latlng.lng);
-                        markers[0].setLatLng(startingLatLng);
-                        map.setView(startingLatLng, 13);
-                        centerMarker.setPopupContent('Distance Calculation Starting Address: ' + address);
-                        drawRoute();
-                    }
+    var address = document.getElementById('address').value;
+    if (address !== '') {
+        var geocoder = L.Control.Geocoder.nominatim();
+        geocoder.geocode(address, function (results) {
+            if (results && results.length > 0) {
+                var latlng = results[0].center;
+                var startingLatLng = L.latLng(latlng.lat, latlng.lng);
+                markers[0].setLatLng(startingLatLng);
+
+                // Remove the existing route layer if it exists
+                if (routeLayer) {
+                    map.removeLayer(routeLayer);
+                }
+
+                // Update the map view to the new start point
+                map.whenReady(function () {
+                    map.setView(startingLatLng, 13);
                 });
+
+                centerMarker.setPopupContent('Distance Calculation Starting Address: ' + address);
+                drawRoute();
+            } else {
+                alert('Address not found. Please enter a valid address.');
             }
-            return false; // Prevent form submission
-        }
+        });
+    } else {
+        alert('Please enter an address.');
+    }
+}
+
 
         function savePoints() {
-            var savedPoints = markers.map(marker => ({
-                lat: marker.getLatLng().lat,
-                lng: marker.getLatLng().lng
-            }));
-            localStorage.setItem('savedPoints', JSON.stringify(savedPoints));
+    var savedRoutesStr = localStorage.getItem('savedRoutes');
+    var savedRoutes = savedRoutesStr ? JSON.parse(savedRoutesStr) : [];
+    var savedPoints = markers.map(marker => ({
+        lat: marker.getLatLng().lat,
+        lng: marker.getLatLng().lng
+    }));
+    savedRoutes.push(savedPoints);
+    localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes));
+
+    // Save the current date and time when the route is saved
+    var currentDate = new Date().toLocaleString();
+    localStorage.setItem('savedDate', currentDate);
+
+    updateAdditionalContent();
+}
+
+
+        function loadPoints(index) {
+    var savedRoutesStr = localStorage.getItem('savedRoutes');
+    if (savedRoutesStr) {
+        var savedRoutes = JSON.parse(savedRoutesStr);
+        var savedPoints = savedRoutes[index];
+        var startPoint = savedPoints[0]; // Get the first point as the start point
+
+        // Remove the existing route layer if it exists
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
         }
 
-        function loadPoints() {
-            var savedPointsStr = localStorage.getItem('savedPoints');
-            if (savedPointsStr) {
-                var savedPoints = JSON.parse(savedPointsStr);
-                clearMarkers();
-                savedPoints.forEach(point => {
-                    var latlng = L.latLng(point.lat, point.lng);
-                    var marker = L.marker(latlng).addTo(map);
-                    markers.push(marker);
-                });
-                drawRoute();
-            }
-        }
+        // Set the new start point on the map and update the popup content
+        centerMarker.setLatLng(L.latLng(startPoint.lat, startPoint.lng));
+        centerMarker.setPopupContent('Distance Calculation Starting Address: ' + startPoint.address);
+
+        // Clear all markers except the centerMarker
+        clearMarkers(true);
+
+        savedPoints.forEach((point, i) => {
+            var latlng = L.latLng(point.lat, point.lng);
+            var marker = L.marker(latlng).addTo(map);
+            markers.push(marker);
+
+            // Set the popup content for each marker
+            marker.setPopupContent('Point ' + (i + 1) + ': You stopped here');
+        });
+
+        drawRoute();
+
+        // Find the bounding box of the route
+        var routeBounds = L.latLngBounds(savedPoints.map(point => [point.lat, point.lng]));
+
+        // Pan the map to fit within the bounding box with a slightly more zoomed-out view
+        map.fitBounds(routeBounds, { padding: [50, 50], maxZoom: map.getZoom() - 1 });
+    }
+}
+
+
+
+
+
+
+function updateAdditionalContent() {
+    var savedRoutesStr = localStorage.getItem('savedRoutes');
+    if (savedRoutesStr) {
+        var savedRoutes = JSON.parse(savedRoutesStr);
+        var savedRoutesContainer = document.getElementById('saved-routes');
+        savedRoutesContainer.innerHTML = ''; // Clear existing content
+
+        savedRoutes.forEach((route, index) => {
+            var routeContainer = document.createElement('div');
+
+            var link = document.createElement('a');
+            link.href = '#';
+            link.textContent = 'Route ' + (index + 1);
+            link.onclick = function () {
+                loadPoints(index);
+                return false;
+            };
+
+            var deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = function () {
+                deleteRoute(index);
+                return false;
+            };
+
+            routeContainer.appendChild(link);
+            routeContainer.appendChild(document.createTextNode(' ')); // Add spacing between link and delete button
+            routeContainer.appendChild(deleteButton);
+
+            savedRoutesContainer.appendChild(routeContainer);
+            savedRoutesContainer.appendChild(document.createElement('br'));
+        });
+    }
+}
+
+function deleteRoute(index) {
+    var savedRoutesStr = localStorage.getItem('savedRoutes');
+    if (savedRoutesStr) {
+        var savedRoutes = JSON.parse(savedRoutesStr);
+        savedRoutes.splice(index, 1);
+        localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes));
+
+        updateAdditionalContent();
+    }
+}
+function displaySavedRoutes() {
+    var savedRoutesStr = localStorage.getItem('savedRoutes');
+    if (savedRoutesStr) {
+        var savedRoutes = JSON.parse(savedRoutesStr);
+        clearMarkers();
+        savedRoutes.forEach((savedPoints, index) => {
+            savedPoints.forEach(point => {
+                var latlng = L.latLng(point.lat, point.lng);
+                var marker = L.marker(latlng).addTo(map);
+                markers.push(marker);
+            });
+        });
+        drawRoute();
+    }
+}
+
+
+
+
 
         function clearMarkers(keepCenterMarker = false) {
     if (!keepCenterMarker) {
