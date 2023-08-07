@@ -1,6 +1,6 @@
 import uuid
 import boto3
-from botocore.exceptions import ClientError
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
@@ -171,7 +171,8 @@ def user_exercises(request):
 
 @login_required
 def exercises_detail(request, exercise_id):
-    exercise = ImportedExercise.objects.get(id=exercise_id)
+    exercise = get_object_or_404(ImportedExercise, id=exercise_id)
+
 
     formatted_primary_muscles = [
         muscle.strip("[]'").capitalize() for muscle in exercise.primaryMuscles.split(',')
@@ -194,31 +195,28 @@ def exercises_detail(request, exercise_id):
 
 
 class ExerciseCreate(CreateView):
-    # Your existing view code...
+    model = ImportedExercise
+    form_class = ExerciseForm
+    template_name = 'main_app/exercises_form.html'
 
     def form_valid(self, form):
-        # Associate the user with the model instance
         form.instance.user = self.request.user
         form.instance.imported = False
 
-        # Handle photo upload to AWS S3
         photo_file = self.request.FILES.get('photo')
         if photo_file:
-            s3_client = boto3.client(
-                's3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name=settings.AWS_S3_REGION_NAME
-            )
-            try:
-                key = f'imported_exercise_photos/{photo_file.name}'
-                s3_client.upload_fileobj(photo_file, settings.AWS_STORAGE_BUCKET_NAME, key)
-                form.instance.photo = key
-            except ClientError as e:
-                # Handle any errors that might occur during file upload
-                print("Error uploading photo to S3:", e)
+            unique_filename = f"{uuid.uuid4().hex}.jpg"
+
+            s3_client = boto3.client('S3')
+            s3_client.upload_fileobj(photo_file, 'fitbuddy-bucket', unique_filename)
+            form.instance.photo = unique_filename
+        else:
+            form.instance.photo = None
 
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
     
 def signup(request):
   error_message = ''

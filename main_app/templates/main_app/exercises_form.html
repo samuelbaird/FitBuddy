@@ -10,10 +10,10 @@
       {% else %}
       <span class="card-title">Add Exercise</span>
       {% endif %} 
-        <form method="POST" action="">
+        <form method="POST" enctype="multipart/form-data" action="">
           {% csrf_token %}
           {{ form.as_p }}
-          <input type="file" name="photo" accept="image/">
+          <br>
           <input type="submit" class="btn indigo pulse" value="New Exercise"/>
         </form>
     </div>
@@ -24,6 +24,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     var levelLabel = document.querySelector('label[for="{{ form.level.id_for_label }}"]');
     var primaryMuscleLabel = document.querySelector('label[for="{{ form.primaryMuscles.id_for_label }}"]');
+    var photoLabel = document.querySelector('label[for="{{ form.photo.id_for_label }}"]');
 
     if (levelLabel) {
       levelLabel.textContent = 'Difficulty:';
@@ -31,6 +32,10 @@
 
     if (primaryMuscleLabel) {
       primaryMuscleLabel.textContent = 'Muscle:';
+    }
+
+    if (photoLabel) {
+      photoLabel.textContent = 'Upload Image:';
     }
 
     const primaryMuscleEl = document.getElementById('id_primaryMuscles');

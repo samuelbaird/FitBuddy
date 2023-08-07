@@ -17,9 +17,7 @@
    <div class="card">
      <div class="card-image">
        <div class="carousel carousel-slider">
-         {% for image in exercise.images %}
-           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="../../../static/exercises_images/{{ image }}"></a>
-         {% endfor %}
+           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="{{ exercise.photo.url }}"></a>
        </div>
      </div>
    </div>
