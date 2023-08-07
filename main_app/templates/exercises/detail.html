@@ -17,8 +17,10 @@
    <div class="card">
      <div class="card-image">
        <div class="carousel carousel-slider">
+        {% if exercise.photo %}
            <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="{{ exercise.photo.url }}"></a>
-       </div>
+        {%endif%}
+          </div>
      </div>
    </div>
  </div>

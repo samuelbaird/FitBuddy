@@ -105,12 +105,11 @@ def muscle_exercise_detail(request, muscle, exercise_id):
     if isinstance(exercise.instructions, str) and exercise.instructions:
         try:
             exercise.instructions = eval(exercise.instructions)
-        except Exception as e:
-            print(f"Failed to evaluate instructions for exercise {exercise.id}: {e}")
-            exercise.instructions = []
+        except SyntaxError:
+            exercise.instructions = [exercise.instructions]
     else:
         exercise.instructions = []
-  
+
     steps_list = []
     for instruction in exercise.instructions:
         steps = instruction.split('. ')
