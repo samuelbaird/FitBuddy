@@ -9,7 +9,7 @@
       {% for exercise in exercises %}
       <div class="col s4">
         <a href="{% url 'muscle_exercise_detail' exercise.name exercise.id  %}">
-        <div class="card" style="height: 17rem;">
+        <div class="card" style="height: 19rem;">
           <div class="card-image">
             {% for image in exercise.images %}
               {% if forloop.counter0 == 0 %}

@@ -85,33 +85,51 @@ def create_or_update_profile(sender, instance, created, **kwargs):
     else:
         instance.profile.save()
   
+class ImportedExercise(models.Model):
+    name = models.CharField(max_length=100, default='')
+    force = models.CharField(max_length=100, default='', null=True, blank=True)
+    level = models.CharField(
+    max_length=20,
+    choices=DIFFICULTY,
+    default=DIFFICULTY[0][0],
+    )
+    mechanic = models.CharField(max_length=100, default='', null=True, blank=True)
+    equipment = models.CharField(max_length=100, default='', null=True, blank=True)
+    primaryMuscles = models.CharField(max_length=100, default='')
+    secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
+    category = models.CharField(max_length=100, default='', null=True, blank=True)
+    images = models.CharField(max_length=100, default='')
+    instructions = models.CharField(max_length=1000, default='')
 
-class Exercise(models.Model):
-     name = models.CharField(max_length=100, default='')
-     force = models.CharField(max_length=100, default='', null=True, blank=True)
-     level = models.CharField(
-        max_length=1,
-        choices=DIFFICULTY,
-        default=DIFFICULTY[0][0],
-     )
-     mechanic = models.CharField(max_length=100, default='', null=True, blank=True)
-     equipment = models.CharField(max_length=100, default='', null=True, blank=True)
-     primaryMuscles = models.CharField(max_length=100, default='')
-     secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
-     category = models.CharField(max_length=100, default='', null=True, blank=True)
-     images = models.CharField(max_length=100, default='')
-     instructions = models.CharField(max_length=1000, default='')
-
-     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-     def __str__(self):
+    def __str__(self):
         return f'{self.name} ({self.id})'
 
-     def get_absolute_url(self):
+class Exercise(models.Model):
+    name = models.CharField(max_length=100, default='')
+    force = models.CharField(max_length=100, default='', null=True, blank=True)
+    level = models.CharField(
+    max_length=20,
+    choices=DIFFICULTY,
+    default=DIFFICULTY[0][0],
+    )
+    mechanic = models.CharField(max_length=100, default='', null=True, blank=True)
+    equipment = models.CharField(max_length=100, default='', null=True, blank=True)
+    primaryMuscles = models.CharField(max_length=100, default='')  
+    secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
+    category = models.CharField(max_length=100, default='', null=True, blank=True)
+    images = models.CharField(max_length=100, default='')
+    instructions = models.CharField(max_length=1000, default='')
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name} ({self.id})'
+
+    def get_absolute_url(self):
         return reverse('detail', kwargs={'exercise_id': self.id})
      
-     def save_to_imported_exercise(self):
-         imported_exercise = ImportedExercise(
+    def save_to_imported_exercise(self):
+        imported_exercise = ImportedExercise(
                 name = self.name,
                 force = self.force,
                 level = self.level,
@@ -123,23 +141,9 @@ class Exercise(models.Model):
                 images = self.images,
                 instructions = self.instructions,
             )
-         imported_exercise.save()
+        imported_exercise.save()
 
-class ImportedExercise(models.Model):
-     name = models.CharField(max_length=100, default='')
-     force = models.CharField(max_length=100, default='')
-     level = models.CharField(max_length=100, default='')
-     mechanic = models.CharField(max_length=100, default='')
-     equipment = models.CharField(max_length=100, default='')
-     primaryMuscles = models.CharField(max_length=100, default='')
-     secondaryMuscles = models.CharField(max_length=100, default='')
-     category = models.CharField(max_length=100, default='')
-     images = models.CharField(max_length=100, default='')
-     instructions = models.CharField(max_length=1000, default='')
-
-     def __str__(self):
-        return f'{self.name} ({self.id})'
-     
+    
 class Workout(models.Model):
   name = models.CharField(max_length=100)
   exercises = models.ManyToManyField('ImportedExercise', through='ExerciseInWorkout')

@@ -6,22 +6,16 @@
       <div class="col s6" style="padding-top: 10%;">
         <div class="card">
           <div class="card-image, indigo">
-            <li class="yellow-text" style="font-size: 20px">Name: {{ exercise.name }}</li> </a>
+            <li class="yellow-text" style="font-size: 20px">Name: {{ exercise.name }}</li>
             {% comment %} <li class="yellow-text" style="font-size: 20px">Force: {{ exercise.force }}</li> {% endcomment %}
             <li class="yellow-text" style="font-size: 20px">Level: {{ exercise.level }}</li>
             {% comment %} <li class="yellow-text" style="font-size: 20px">Mechanic: {{ exercise.mechanic }}</li> {% endcomment %}
             {% comment %} <li class="yellow-text" style="font-size: 20px">Equipment: {{ exercise.equipment }}</li> {% endcomment %}
-            <li class="yellow-text" style="font-size: 20px">
-              Primary Muscles: {{ exercise.primaryMuscles }}
-            </li>
-            <li class="yellow-text" style="font-size: 20px">
-              {% comment %} Secondary Muscles: {{ exercise.secondaryMuscles }} {% endcomment %}
-            </li>
+            <li class="yellow-text" style="font-size: 20px">Primary Muscles: {{ exercise.primaryMuscles }}</li>
+            {% comment %} <li class="yellow-text" style="font-size: 20px">Secondary Muscles: {{ exercise.secondaryMuscles }}</li> {% endcomment %}
             {% comment %} <li class="yellow-text" style="font-size: 20px">Category: {{ exercise.category }}</li> {% endcomment %}
             <li class="yellow-text" style="font-size: 20px">Images: {{ exercise.images }}</li>
-            <li class="yellow-text" style="font-size: 20px">
-              Instructions: {{ exercise.instructions }}
-            </li>
+            <li class="yellow-text" style="font-size: 20px">Instructions: {{ exercise.instructions }}</li>
           </div>
           <div class="card-action yellow lighten-2">
           <a class="btn-large btn indigo" href="{% url 'user_exercises' %}">My Exercises</a>

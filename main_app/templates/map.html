@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-    <div id="map" style="height: 400px;"></div>
-    <input type="text" id="address" placeholder="Enter an address">
-    <button onclick="setStartPoint()">Set Start Point</button>
-    <button onclick="savePoints()">Save Points</button>
-    <button onclick="loadPoints()">Load Points</button>
-    <button onclick="deletePoints()">Delete Points</button>
-    <div id="distance-info"></div>
-
+<style>
+    #map-container {
+        height: 400px;
+    }
+</style>
+<div class="row">
+    <div class="col s9" id="map-container">
+        <div id="map" style="height: 100%;"></div>
+    </div>
+    
+        
+        <div class="card" id="additional-content">
+            <!-- Add content for the additional div here -->
+            <h5>Plan a Route!</h5>
+            <p>Search an address in the input field and press Set Start Point to start planning your route! </p>
+            <p>Feel free to add more content here.</p>
+        </div>
+    
+</div>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -19,6 +29,7 @@
         var maxPoints = 20;
         var routeLayer;
         var centerMarker;
+        
 
         function initMap() {
             map = L.map('map').setView([38.9072, -77.0369], 13);
@@ -116,15 +127,16 @@
         }
 
         function onMapClick(e) {
-            if (markers.length < maxPoints) {
-                var clickedCoordinates = e.latlng;
-                var marker = L.marker(clickedCoordinates).addTo(map)
-                    .bindPopup('You clicked at ' + clickedCoordinates.toString())
-                    .openPopup();
-                markers.push(marker);
-                drawRoute();
-            }
-        }
+    if (markers.length < maxPoints) {
+        var clickedCoordinates = e.latlng;
+        var pointNumber = markers.length + 1; // Start numbering from 1
+        var marker = L.marker(clickedCoordinates).addTo(map)
+            .bindPopup('Point ' + pointNumber + ': You stopped here '  )
+            .openPopup();
+        markers.push(marker);
+        drawRoute();
+    }
+}
 
         function setStartPoint() {
             var address = document.getElementById('address').value;
@@ -167,27 +179,29 @@
         }
 
         function clearMarkers(keepCenterMarker = false) {
-            if (!keepCenterMarker) {
-                map.removeLayer(centerMarker);
-                centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
-                    .bindPopup('Route Start')
-                    .openPopup();
-                markers = [centerMarker];
-            } else {
-                markers.forEach(marker => {
-                    if (marker !== centerMarker) {
-                        map.removeLayer(marker);
-                    }
-                });
-                markers = [centerMarker];
+    if (!keepCenterMarker) {
+        map.removeLayer(centerMarker);
+        centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+            .bindPopup('Route Start')
+            .openPopup();
+        markers = [centerMarker];
+    } else {
+        markers.forEach((marker, index) => {
+            if (marker !== centerMarker) {
+                map.removeLayer(marker);
+                // Renumber the points if needed
+                marker.setPopupContent('Point ' + (index + 1));
             }
+        });
+        markers = [centerMarker];
+    }
 
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-                routeLayer = null;
-            }
-            updateDistance();
-        }
+    if (routeLayer) {
+        map.removeLayer(routeLayer);
+        routeLayer = null;
+    }
+    updateDistance();
+}
 
         function deletePoints() {
             clearMarkers(true); // Pass "true" to keep the center marker
@@ -196,6 +210,16 @@
 
         initMap();
     </script>
+    <div class="col s3" style="height: 400px; overflow-y: auto;">
+        <div id="distance-info"></div>
+        <input style="width: 74%;" type="text" id="address" placeholder="Enter an address">
+        <br>
+        <button class="waves-effect waves-light btn-small indigo button" onclick="setStartPoint()">Set Start Point</button>
+        <button class="waves-effect waves-light btn-small indigo button" onclick="savePoints()">Save Points</button>
+        <button class="waves-effect waves-light btn-small indigo button" onclick="loadPoints()">Load Points</button>
+        <button class="waves-effect waves-light btn-small indigo button" onclick="deletePoints()">Delete Points</button>
+    </div>
 
 </div>
+
 {% endblock %}
