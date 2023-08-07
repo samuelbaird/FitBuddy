@@ -13,6 +13,7 @@
         <form method="POST" action="">
           {% csrf_token %}
           {{ form.as_p }}
+          <input type="file" name="photo" accept="image/">
           <input type="submit" class="btn indigo pulse" value="New Exercise"/>
         </form>
     </div>
