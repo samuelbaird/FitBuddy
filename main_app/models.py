@@ -106,6 +106,8 @@ class ImportedExercise(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.id})'
+    def get_absolute_url(self):
+        return reverse('detail', args=[str(self.id)])
 
 class Workout(models.Model):
   name = models.CharField(max_length=100)
