@@ -1,19 +1,16 @@
 {% extends 'base.html' %} 
-{% block content %}
 
-<div class="container">
+{% block content %}
+<h3 style="text-align: center;">{{ exercise.name|capfirst }} </h3>
+
+
     <div class="row">
-      <div class="col s6" style="padding-top: 10%;">
+      <div class="col s6">
         <div class="card">
-          <div class="card-image, indigo">
-            <li class="yellow-text" style="font-size: 20px">Name: {{ exercise.name }}</li>
-            {% comment %} <li class="yellow-text" style="font-size: 20px">Force: {{ exercise.force }}</li> {% endcomment %}
-            <li class="yellow-text" style="font-size: 20px">Level: {{ exercise.level }}</li>
-            {% comment %} <li class="yellow-text" style="font-size: 20px">Mechanic: {{ exercise.mechanic }}</li> {% endcomment %}
-            {% comment %} <li class="yellow-text" style="font-size: 20px">Equipment: {{ exercise.equipment }}</li> {% endcomment %}
+          <div class="card-content">
+            <h6> Name: {{ exercise.name }}</h6>
+            <h6>Level: {{ exercise.level }}</h6>
             <li class="yellow-text" style="font-size: 20px">Primary Muscles: {{ exercise.primaryMuscles }}</li>
-            {% comment %} <li class="yellow-text" style="font-size: 20px">Secondary Muscles: {{ exercise.secondaryMuscles }}</li> {% endcomment %}
-            {% comment %} <li class="yellow-text" style="font-size: 20px">Category: {{ exercise.category }}</li> {% endcomment %}
             <li class="yellow-text" style="font-size: 20px">Images: {{ exercise.images }}</li>
             <li class="yellow-text" style="font-size: 20px">Instructions: {{ exercise.instructions }}</li>
           </div>
@@ -24,7 +21,7 @@
         </div>
       </div>
     </div>
-  </div>
+
 
 
 

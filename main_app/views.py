@@ -53,19 +53,16 @@ def exercises_index(request):
 
     categorized_exercises_dict = dict(categorized_exercises_dict)
 
-    # Get newly created exercises and add them to the context
     newly_created_exercises = Exercise.objects.filter(user=request.user)
 
-    # Combine the importedexercises and newly created exercises in one list
     all_exercises_list = list(all_imported_exercises) + list(newly_created_exercises)
 
-    # Create a new dictionary with primary muscles as keys and list of exercises as values
     combined_exercises_dict = defaultdict(list)
     for exercise in all_exercises_list:
         primary_muscles = exercise.primaryMuscles
         combined_exercises_dict[primary_muscles].append(exercise)
 
-    # Convert the dictionary to a regular dictionary
+
     combined_exercises_dict = dict(combined_exercises_dict)
 
     return render(request, 'exercises/exercises_index.html', {
@@ -101,12 +98,6 @@ def muscle_exercise_detail(request, muscle, exercise_id):
   }
   return render(request, 'exercises/muscle_exercise_detail.html', context)
 
-@login_required
-def exercises_detail(request, exercise_id):
-  exercise = Exercise.objects.get(id=exercise_id)
-  return render(request, 'exercises/detail.html', {
-    'exercise': exercise
-  })
 
 @login_required
 def profile(request):
@@ -129,13 +120,37 @@ def profile(request):
 @login_required
 def user_exercises(request):
     user_exercises = Exercise.objects.filter(user=request.user)
+
+    for exercise in user_exercises:
+        formatted_primary_muscles = [
+            muscle.strip("[]'").capitalize() for muscle in exercise.primaryMuscles.split(',')
+        ]
+        exercise.primaryMuscles = ", ".join(formatted_primary_muscles)
+
     return render(request, 'user_exercises.html', {'user_exercises': user_exercises})
+
+@login_required
+def exercises_detail(request, exercise_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+
+    formatted_primary_muscles = [
+        muscle.strip("[]'").capitalize() for muscle in exercise.primaryMuscles.split(',')
+    ]
+    exercise.primaryMuscles = ", ".join(formatted_primary_muscles)
+
+    steps_list = []
+    for instruction in exercise.instructions:
+        steps = instruction.split('. ')
+        steps_list.extend(steps)
+
+    return render(request, 'exercises/detail.html', {'exercise': exercise})
+
 
 class ExerciseCreate(CreateView):
     model = Exercise
     form_class = ExerciseForm
     template_name = 'main_app/exercises_form.html'
-    success_url = '/exercises/'  # Update this to your desired success URL
+    success_url = '/exercises/' 
 
     def form_valid(self, form):
         form.instance.user = self.request.user
