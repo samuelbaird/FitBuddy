@@ -61,10 +61,13 @@ def exercises_index(request):
         'combined_exercises_dict': categorized_exercises_dict,
     })
 
-
 @login_required
 def muscle_index(request, muscle):
-    exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
+    exercises = ImportedExercise.objects.filter(
+        Q(primaryMuscles__contains=muscle) & 
+        (Q(imported=True) | Q(user=request.user))
+    )
+    
     for exercise in exercises:
         if isinstance(exercise.images, str) and exercise.images:
             try:
@@ -82,6 +85,7 @@ def muscle_index(request, muscle):
         'exercises': exercises,
     }
     return render(request, 'exercises/muscle_index.html', context)
+
 
 
 def muscle_exercise_detail(request, muscle, exercise_id):
