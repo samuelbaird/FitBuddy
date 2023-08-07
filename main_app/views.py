@@ -20,7 +20,7 @@ def get_difficulty_label(key):
     for k, label in DIFFICULTY:
         if k == key:
             return label
-    return ''  # Return an empty string if no label is found for the key
+    return ''
 
 
 def home(request):
@@ -127,7 +127,7 @@ def muscle_exercise_detail(request, muscle, exercise_id):
         'muscle_name': muscle,
         'exercise': exercise,
         'steps_list': steps_list,
-        'exercise_level_label': exercise_level_label,  # Add this line to the context
+        'exercise_level_label': exercise_level_label,
     }
     return render(request, 'exercises/muscle_exercise_detail.html', context)
 
@@ -161,7 +161,7 @@ def user_exercises(request):
         ]
         exercise.primaryMuscles = ", ".join(formatted_primary_muscles)
 
-        exercise.level = get_difficulty_label(exercise.level)  # Update level with the label
+        exercise.level = get_difficulty_label(exercise.level) 
 
     return render(request, 'exercises/user_exercises.html', {'user_exercises': user_exercises})
 
@@ -174,12 +174,19 @@ def exercises_detail(request, exercise_id):
     ]
     exercise.primaryMuscles = ", ".join(formatted_primary_muscles)
 
+    exercise_level_label = get_difficulty_label(exercise.level)
+
     steps_list = []
     for instruction in exercise.instructions:
         steps = instruction.split('. ')
         steps_list.extend(steps)
 
-    return render(request, 'exercises/detail.html', {'exercise': exercise})
+    context = {
+        'exercise': exercise,
+        'exercise_level_label': exercise_level_label,
+        'steps_list': steps_list,
+    }
+    return render(request, 'exercises/detail.html', context)
 
 
 class ExerciseCreate(CreateView):
