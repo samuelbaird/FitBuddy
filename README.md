@@ -11,38 +11,38 @@
 [Trello Board Link] (https://trello.com/b/hPTEwQTI/fitness-app)
 
 ## Wireframe
-![Alt text] (/main_app/static/css/READMEpics/fitbuddywireframe.png "Wireframe")
+![Alt text](main_app/static/css/READMEpics/fitbuddywireframe.png)
 
 ## ERD 
-![Alt text] (/main_app/static/css/READMEpics/erd.png "ERD")
+![Alt text](/main_app/static/css/READMEpics/erd.png "ERD")
 
 ## Screenshots
 ### Home Page
-![Alt text] (/main_app/static/css/READMEpics/fitbuddyhome.png "home")
+![Alt text](/main_app/static/css/READMEpics/fitbuddyhome.png "home")
 
 ### Map Page
-![Alt text] (/main_app/static/css/READMEpics/map.png "map")
+![Alt text](/main_app/static/css/READMEpics/map.png "map")
 
 ## Add Exercise
-![Alt text] (/main_app/static/css/READMEpics/addexercise.png "addexercise")
+![Alt text](/main_app/static/css/READMEpics/addexercise.png "addexercise")
 
 ## Exercise Database
-![Alt text] (/main_app/static/css/READMEpics/exercisedatabase.png "exercise database")
+![Alt text](/main_app/static/css/READMEpics/exercisedatabase.png "exercise database")
 
 ## Exercise Database Detail
-![Alt text] (/main_app/static/css/READMEpics/exercisedatabase2.png "exercise database detail")
+![Alt text](/main_app/static/css/READMEpics/exercisedatabase2.png "exercise database detail")
 
 ## My Workouts 
-![Alt text] (/main_app/static/css/READMEpics/myworkouts.png "My workouts")
+![Alt text](/main_app/static/css/READMEpics/myworkouts.png "My workouts")
 
 ## Update Workouts
-![Alt text] (/main_app/static/css/READMEpics/updateworkout.png "Update workout")
+![Alt text](/main_app/static/css/READMEpics/updateworkout.png "Update workout")
 
 ## Profile
-![Alt text] (/main_app/static/css/READMEpics/profile.png "Profile")
+![Alt text](/main_app/static/css/READMEpics/profile.png "Profile")
 
 ## Update Profile
-![Alt text] (/main_app/static/css/READMEpics/updateprofile.png "update profile")
+![Alt text](/main_app/static/css/READMEpics/updateprofile.png "update profile")
 
 # Challenges
 * Image upload, explored but couldn't get it to work
@@ -57,4 +57,4 @@
 *The haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes. Important in navigation, it is a special case of a more general formula in spherical trigonometry, the law of haversines, that relates the sides and angles of spherical triangles. AKA distance between two points in relation to the earth.
 
 
-![Alt text] (/main_app/static/READMEpics/haversinedistance.png "haversine distance ")
+![Alt text](/main_app/static/css/READMEpics/haversinedistance.png "haversine distance ")
