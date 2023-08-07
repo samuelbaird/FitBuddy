@@ -12,7 +12,7 @@
           <div class="card-image indigo">
             <li style="font-size: 20px"> <span class="white-text">  Name: </span> {{ exercise.name }}</li> 
             <li style="font-size: 20px"><span class="white-text">Level: </span> {{ exercise.level }}</li>
-            <li style="font-size: 20px"><span class="white-text"> Primary Muscles: </span> {{ exercise.primaryMuscles|join:", " }} </li>
+            <li style="font-size: 20px"><span class="white-text"> Primary Muscles: </span> {{ exercise.primaryMuscles}} </li>
             <li style="font-size: 20px"><span class="white-text"> Images: </span> {{ exercise.images }}</li>
             <li style="font-size: 20px"> <span class="white-text"> Instructions: </span> {{ exercise.instructions }} </li>
           </div>
@@ -27,5 +27,15 @@
   </div>
   {% endfor %}
 </ul>
+
+<script>
+  // Remove square brackets from the primaryMuscles field
+  document.addEventListener('DOMContentLoaded', function() {
+    for (let i = 1; i <= {{ user_exercises|length }}; i++) {
+      const primaryMusclesEl = document.getElementById('primaryMuscles' + i);
+      primaryMusclesEl.textContent = primaryMusclesEl.textContent.replace(/\[|\]/g, '');
+    }
+  });
+</script>
 
 {% endblock %}

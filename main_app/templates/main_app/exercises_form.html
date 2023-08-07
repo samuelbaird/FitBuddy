@@ -38,10 +38,8 @@
     for (const option of primaryMuscleEl.options) {
       option.textContent = option.textContent.replace(/\[|\]/g, '');
 
-      // Remove quotation marks from the option text
       option.textContent = option.textContent.replace(/['"]+/g, '');
 
-      // Capitalize the first letter of every word in the option text
       option.textContent = option.textContent.replace(/\b\w/g, (match) => match.toUpperCase());
     }
   });
