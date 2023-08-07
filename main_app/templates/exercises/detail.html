@@ -18,7 +18,7 @@
      <div class="card-image">
        <div class="carousel carousel-slider">
          {% for image in exercise.images %}
-           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="../../../static/exercises_images/{{ image }}"></a>
+           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="{{ image.url }}"></a>
          {% endfor %}
        </div>
      </div>
@@ -45,8 +45,5 @@
     var instances = M.Carousel.init(elems, { fullWidth: true, indicators: true });
   });
 </script>
-
-
-
 
 {% endblock %}
