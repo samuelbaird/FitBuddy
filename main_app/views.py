@@ -1,3 +1,7 @@
+import uuid
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.contrib import messages
@@ -190,20 +194,31 @@ def exercises_detail(request, exercise_id):
 
 
 class ExerciseCreate(CreateView):
-    model = ImportedExercise
-    form_class = ExerciseForm
-    template_name = 'main_app/exercises_form.html'
-    success_url = '/exercises/' 
+    # Your existing view code...
 
     def form_valid(self, form):
+        # Associate the user with the model instance
         form.instance.user = self.request.user
         form.instance.imported = False
-        return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['importedexercises'] = ImportedExercise.objects.all()
-        return context
+        # Handle photo upload to AWS S3
+        photo_file = self.request.FILES.get('photo')
+        if photo_file:
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME
+            )
+            try:
+                key = f'imported_exercise_photos/{photo_file.name}'
+                s3_client.upload_fileobj(photo_file, settings.AWS_STORAGE_BUCKET_NAME, key)
+                form.instance.photo = key
+            except ClientError as e:
+                # Handle any errors that might occur during file upload
+                print("Error uploading photo to S3:", e)
+
+        return super().form_valid(form)
     
 def signup(request):
   error_message = ''

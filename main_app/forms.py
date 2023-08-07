@@ -21,7 +21,7 @@ class ExerciseForm(forms.ModelForm):
 
     class Meta:
         model = ImportedExercise
-        fields = ['name', 'level', 'primaryMuscles', 'images', 'instructions']
+        fields = ['name', 'level', 'primaryMuscles', 'images', 'instructions', 'photo']
 
 # class ExerciseForm(forms.ModelForm):
 #     level = forms.ChoiceField(choices=DIFFICULTY)

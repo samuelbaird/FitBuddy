@@ -101,17 +101,11 @@ class ImportedExercise(models.Model):
     images = models.CharField(max_length=100, default='', null=True, blank=True)
     instructions = models.CharField(max_length=1000, default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    photo = models.ImageField(upload_to='imported_exercise_photos/', blank=True, null=True)
     imported = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} ({self.id})'
-
-class Photo(models.Model):
-    url = models.CharField(max_length=200)
-    imported_exercise = models.ForeignKey(ImportedExercise, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Photo for exercise_id: {self.imported_exercise_id} @{self.url}"
 
 class Workout(models.Model):
   name = models.CharField(max_length=100)
