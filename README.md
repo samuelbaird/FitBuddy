@@ -8,7 +8,7 @@
 
 #### Contributions from this amazing team made by Sam, Dennis, and Cory
 ## Trello Board
-[Trello Board Link] (https://trello.com/b/hPTEwQTI/fitness-app)
+[Trello Board Link](https://trello.com/b/hPTEwQTI/fitness-app)
 
 ## Wireframe
 ![Alt text](main_app/static/css/READMEpics/fitbuddywireframe.png)
