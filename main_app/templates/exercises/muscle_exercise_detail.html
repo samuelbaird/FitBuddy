@@ -8,8 +8,8 @@
    <div class="card">
      <div class="card-content">
        <h6>Exercise Name: {{exercise.name}}</h6>
-       <h6>Difficulty: {{exercise.level|capfirst}}</h6>
-       <h6>Muscle Group(s): {{ exercise.primaryMuscles|slice:"2:-2"|capfirst }}</h6>
+       <h6>Difficulty: {{exercise_level_label|capfirst}}</h6>
+       <h6>Muscle Group(s): {{ exercise.primaryMuscles|slice:"2:-2"|title }}</h6>
      </div>
    </div>
  </div>

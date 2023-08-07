@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.db.models import Q
-from .models import Profile, Workout, ExerciseInWorkout, ImportedExercise
+from .models import Profile, Workout, ExerciseInWorkout, ImportedExercise, DIFFICULTY
 from .forms import ExerciseForm, ProfileForm, WorkoutForm
 from collections import defaultdict
 from datetime import date
@@ -16,6 +16,13 @@ import json
 
 # API-key = gXLCkA3vzl+aRqbGHmQJUg==isLFzMJoImFUhgL5
 # Create your views here.
+def get_difficulty_label(key):
+    for k, label in DIFFICULTY:
+        if k == key:
+            return label
+    return ''  # Return an empty string if no label is found for the key
+
+
 def home(request):
   if request.method == 'GET':
     api_url = 'https://api.api-ninjas.com/v1/quotes?category=dad'
@@ -110,10 +117,13 @@ def muscle_exercise_detail(request, muscle, exercise_id):
     else:
         exercise.images = []
         
+    exercise_level_label = get_difficulty_label(exercise.level)
+
     context = {
         'muscle_name': muscle,
         'exercise': exercise,
         'steps_list': steps_list,
+        'exercise_level_label': exercise_level_label,  # Add this line to the context
     }
     return render(request, 'exercises/muscle_exercise_detail.html', context)
 
@@ -147,7 +157,9 @@ def user_exercises(request):
         ]
         exercise.primaryMuscles = ", ".join(formatted_primary_muscles)
 
-    return render(request, 'user_exercises.html', {'user_exercises': user_exercises})
+        exercise.level = get_difficulty_label(exercise.level)  # Update level with the label
+
+    return render(request, 'exercises/user_exercises.html', {'user_exercises': user_exercises})
 
 @login_required
 def exercises_detail(request, exercise_id):

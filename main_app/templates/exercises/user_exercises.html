@@ -1,0 +1,40 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<h1>Your Exercises</h1>
+<ul>
+  <div class="container">
+    <div class="row">
+      {% for exercise in user_exercises %}
+      <div class="col s12">
+        <a href="{% url 'detail' exercise.id %}" >
+        <div class="card">
+          <div class="card-content">
+            <h5> Name: {{ exercise.name }}</h5> 
+            <h5> Level: {{ exercise.level }}</h5>
+            <h5> Muscles: {{ exercise.primaryMuscles}} </h5>
+            <h5> Images: {{ exercise.images }}</h5>
+          </div>
+          </a>
+          <div class="card-action">
+            <a href="{% url 'exercises_update' exercise.id %}">Edit</a>
+            <a href="{% url 'exercises_delete' exercise.id %}">Delete</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</ul>
+
+<script>
+  // Remove square brackets from the primaryMuscles field
+  document.addEventListener('DOMContentLoaded', function() {
+    for (let i = 1; i <= {{ user_exercises|length }}; i++) {
+      const primaryMusclesEl = document.getElementById('primaryMuscles' + i);
+      primaryMusclesEl.textContent = primaryMusclesEl.textContent.replace(/\[|\]/g, '');
+    }
+  });
+</script>
+
+{% endblock %}
