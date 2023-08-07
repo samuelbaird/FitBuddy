@@ -9,11 +9,6 @@ class ExerciseForm(forms.ModelForm):
         widget=forms.Select(attrs={'class':'browser-default'}),
     )
     
-
-    # primaryMuscles = forms.ChoiceField(
-    #     choices=[(muscle.strip("[]'"), muscle.strip("[]'").capitalize()) for muscle in ImportedExercise.objects.values_list('primaryMuscles', flat=True).distinct()],
-    # )
-
     primaryMuscles = forms.ChoiceField(
         choices=[(muscle, muscle) for muscle in set(ImportedExercise.objects.values_list('primaryMuscles', flat=True).distinct())],
         widget=forms.Select(attrs={'class':'browser-default'}),

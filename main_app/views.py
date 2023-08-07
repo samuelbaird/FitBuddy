@@ -194,31 +194,35 @@ def exercises_detail(request, exercise_id):
 
 
 class ExerciseCreate(CreateView):
-    # Your existing view code...
+    model = ImportedExercise
+    form_class = ExerciseForm
+    template_name = 'main_app/exercises_form.html'
 
     def form_valid(self, form):
-        # Associate the user with the model instance
+        # Set the current user and 'imported' flag
         form.instance.user = self.request.user
         form.instance.imported = False
 
-        # Handle photo upload to AWS S3
+        # Generate a unique filename using uuid
+        unique_filename = f"{uuid.uuid4().hex}.jpg"
+
+        # Upload the file to AWS S3
         photo_file = self.request.FILES.get('photo')
         if photo_file:
-            s3_client = boto3.client(
-                's3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name=settings.AWS_S3_REGION_NAME
-            )
-            try:
-                key = f'imported_exercise_photos/{photo_file.name}'
-                s3_client.upload_fileobj(photo_file, settings.AWS_STORAGE_BUCKET_NAME, key)
-                form.instance.photo = key
-            except ClientError as e:
-                # Handle any errors that might occur during file upload
-                print("Error uploading photo to S3:", e)
+            s3_client = boto3.client('s3')
+            s3_client.upload_fileobj(photo_file, 'fitbuddy-bucket', unique_filename)
+            form.instance.photo = unique_filename
 
         return super().form_valid(form)
+
+    def get_success_url(self):
+        # Return the URL of the detail page for the newly created ImportedExercise
+        return reverse_lazy('detail', kwargs={'exercise_id': self.object.pk})  # Use 'exercise_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['importedexercises'] = ImportedExercise.objects.all()
+        return context
     
 def signup(request):
   error_message = ''
