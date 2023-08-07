@@ -98,50 +98,13 @@ class ImportedExercise(models.Model):
     primaryMuscles = models.CharField(max_length=100, default='')
     secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
     category = models.CharField(max_length=100, default='', null=True, blank=True)
-    images = models.CharField(max_length=100, default='')
+    images = models.CharField(max_length=100, default='', null=True, blank=True)
     instructions = models.CharField(max_length=1000, default='')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    imported = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} ({self.id})'
-
-class Exercise(models.Model):
-    name = models.CharField(max_length=100, default='')
-    force = models.CharField(max_length=100, default='', null=True, blank=True)
-    level = models.CharField(
-    max_length=20,
-    choices=DIFFICULTY,
-    default=DIFFICULTY[0][0],
-    )
-    mechanic = models.CharField(max_length=100, default='', null=True, blank=True)
-    equipment = models.CharField(max_length=100, default='', null=True, blank=True)
-    primaryMuscles = models.CharField(max_length=100, default='')  
-    secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
-    category = models.CharField(max_length=100, default='', null=True, blank=True)
-    images = models.CharField(max_length=100, default='')
-    instructions = models.CharField(max_length=1000, default='')
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.name} ({self.id})'
-
-    def get_absolute_url(self):
-        return reverse('detail', kwargs={'exercise_id': self.id})
-     
-    def save_to_imported_exercise(self):
-        imported_exercise = ImportedExercise(
-                name = self.name,
-                force = self.force,
-                level = self.level,
-                mechanic = self.mechanic,
-                equipment = self.equipment,
-                primaryMuscles = self.primaryMuscles,
-                secondaryMuscles = self.secondaryMuscles,
-                category = self.category,
-                images = self.images,
-                instructions = self.instructions,
-            )
-        imported_exercise.save()
 
     
 class Workout(models.Model):

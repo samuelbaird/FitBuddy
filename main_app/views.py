@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Profile, Exercise, Workout, ExerciseInWorkout, ImportedExercise
+from django.db.models import Q
+from .models import Profile, Workout, ExerciseInWorkout, ImportedExercise
 from .forms import ExerciseForm, ProfileForm, WorkoutForm
 from collections import defaultdict
 from datetime import date
@@ -42,61 +44,79 @@ def about(request):
 def map(request):
   return render(request, 'map.html')
 
+
 @login_required
 def exercises_index(request):
-    all_imported_exercises = ImportedExercise.objects.all()
-    categorized_exercises_dict = defaultdict(list)
+    all_exercises = ImportedExercise.objects.filter(Q(user=request.user) | Q(imported=True))
 
-    for exercise in all_imported_exercises:
+    categorized_exercises_dict = defaultdict(list)
+    
+    for exercise in all_exercises:
         primary_muscles = exercise.primaryMuscles
         categorized_exercises_dict[primary_muscles].append(exercise)
 
     categorized_exercises_dict = dict(categorized_exercises_dict)
 
-    newly_created_exercises = Exercise.objects.filter(user=request.user)
-
-    all_exercises_list = list(all_imported_exercises) + list(newly_created_exercises)
-
-    combined_exercises_dict = defaultdict(list)
-    for exercise in all_exercises_list:
-        primary_muscles = exercise.primaryMuscles
-        combined_exercises_dict[primary_muscles].append(exercise)
-
-
-    combined_exercises_dict = dict(combined_exercises_dict)
-
     return render(request, 'exercises/exercises_index.html', {
-        'combined_exercises_dict': combined_exercises_dict,
+        'combined_exercises_dict': categorized_exercises_dict,
     })
+
 
 @login_required
 def muscle_index(request, muscle):
-  exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
-  for exercise in exercises:
-     exercise.images = eval(exercise.images)
-     exercise.name = exercise.name.replace('/', '-')
-  context = {
-      'muscle_name': muscle,
-      'exercises': exercises,
-  }
-  return render(request, 'exercises/muscle_index.html', context)
+    exercises = ImportedExercise.objects.filter(primaryMuscles__contains=muscle)
+    for exercise in exercises:
+        if isinstance(exercise.images, str) and exercise.images:
+            try:
+                exercise.images = eval(exercise.images)
+            except Exception as e:
+                print(f"Failed to evaluate images for exercise {exercise.id}: {e}")
+                exercise.images = []
+        else:
+            exercise.images = []
+        
+        exercise.name = exercise.name.replace('/', '-')
+    
+    context = {
+        'muscle_name': muscle,
+        'exercises': exercises,
+    }
+    return render(request, 'exercises/muscle_index.html', context)
+
 
 def muscle_exercise_detail(request, muscle, exercise_id):
-  exercise = ImportedExercise.objects.get(id=exercise_id)
-  exercise.instructions = eval(exercise.instructions)
-  
-  steps_list = []
-  for instruction in exercise.instructions:
-    steps = instruction.split('. ')
-    steps_list.extend(steps)
+    exercise = ImportedExercise.objects.get(id=exercise_id)
 
-  exercise.images = eval(exercise.images)
-  context = {
-      'muscle_name': muscle,
-      'exercise': exercise,
-      'steps_list': steps_list,
-  }
-  return render(request, 'exercises/muscle_exercise_detail.html', context)
+    if isinstance(exercise.instructions, str) and exercise.instructions:
+        try:
+            exercise.instructions = eval(exercise.instructions)
+        except Exception as e:
+            print(f"Failed to evaluate instructions for exercise {exercise.id}: {e}")
+            exercise.instructions = []
+    else:
+        exercise.instructions = []
+  
+    steps_list = []
+    for instruction in exercise.instructions:
+        steps = instruction.split('. ')
+        steps_list.extend(steps)
+
+    if isinstance(exercise.images, str) and exercise.images:
+        try:
+            exercise.images = eval(exercise.images)
+        except Exception as e:
+            print(f"Failed to evaluate images for exercise {exercise.id}: {e}")
+            exercise.images = []
+    else:
+        exercise.images = []
+        
+    context = {
+        'muscle_name': muscle,
+        'exercise': exercise,
+        'steps_list': steps_list,
+    }
+    return render(request, 'exercises/muscle_exercise_detail.html', context)
+
 
 
 @login_required
@@ -119,7 +139,7 @@ def profile(request):
 
 @login_required
 def user_exercises(request):
-    user_exercises = Exercise.objects.filter(user=request.user)
+    user_exercises = ImportedExercise.objects.filter(user=request.user)
 
     for exercise in user_exercises:
         formatted_primary_muscles = [
@@ -131,7 +151,7 @@ def user_exercises(request):
 
 @login_required
 def exercises_detail(request, exercise_id):
-    exercise = Exercise.objects.get(id=exercise_id)
+    exercise = ImportedExercise.objects.get(id=exercise_id)
 
     formatted_primary_muscles = [
         muscle.strip("[]'").capitalize() for muscle in exercise.primaryMuscles.split(',')
@@ -147,13 +167,14 @@ def exercises_detail(request, exercise_id):
 
 
 class ExerciseCreate(CreateView):
-    model = Exercise
+    model = ImportedExercise
     form_class = ExerciseForm
     template_name = 'main_app/exercises_form.html'
     success_url = '/exercises/' 
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        form.instance.imported = False
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -221,10 +242,8 @@ def workouts_detail(request, pk):
 
 def create_workout(request):
     if request.method == 'POST':
-        print(request.POST)
         form = WorkoutForm(request.POST)
         if form.is_valid():
-            print('form is valid')
             workout = form.save(commit=False)
             workout.is_template = True
 
@@ -288,7 +307,7 @@ def create_workout(request):
             print(form.errors)
 
     form = WorkoutForm()
-    exercise_list = ImportedExercise.objects.all()
+    exercise_list = ImportedExercise.objects.filter(Q(user=request.user) | Q(imported=True))
     return render(request, 'workouts/workout_form.html', {'form': form, 'exercise_list': exercise_list})
 
 def update_workout(request, pk):
@@ -368,26 +387,38 @@ def update_workout(request, pk):
         if not form.is_valid():
             print('form is not valid')
 
-    exercise_list = ImportedExercise.objects.all()
+    exercise_list = ImportedExercise.objects.filter(Q(user=request.user) | Q(imported=True))
     return render(request, 'workouts/workout_form.html', {
         'form': form,
         'exercise_list': exercise_list,
         'workout_name': workout.name,
     })
 
-
 class ExerciseUpdate(UpdateView):
-    model = Exercise
+    model = ImportedExercise
     form_class = ExerciseForm
     template_name = 'main_app/exercises_form.html'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if not obj.user == self.request.user:
+            raise HttpResponseForbidden("You are not allowed to edit this exercise.")
+        return obj
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
 class ExerciseDelete(DeleteView):
-  model = Exercise
-  success_url = '/'  
+    model = ImportedExercise
+    success_url = '/'  
+
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if not obj.user == self.request.user:
+            raise HttpResponseForbidden("You are not allowed to delete this exercise.")
+        return obj
+
 
 def begin_workout(request, pk):
     template_workout = get_object_or_404(Workout, pk=pk)
