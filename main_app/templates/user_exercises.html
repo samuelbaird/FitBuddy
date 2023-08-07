@@ -10,7 +10,7 @@
       <div class="card">
         <div class="card-content">
           <h6>Exercise Name: {{ exercise.name }}</h6>
-          <h6>Difficulty: {{ exercise.level|capfirst }}</h6>
+          <h6>Difficulty: {{ exercise.get_level_display|capfirst }}</h6>
           <h6>Muscle Group(s): {{ exercise.primaryMuscles|capfirst }}</h6>
         </div>
         <div class="card-image">
