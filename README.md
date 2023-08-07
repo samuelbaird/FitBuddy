@@ -11,38 +11,38 @@
 [Trello Board Link] (https://trello.com/b/hPTEwQTI/fitness-app)
 
 ## Wireframe
-![Alt text] (/main_app/static/READMEpics/fitbuddywireframe.png "Wireframe")
+![Alt text] (/main_app/static/css/READMEpics/fitbuddywireframe.png "Wireframe")
 
 ## ERD 
-![Alt text] (/main_app/static/READMEpics/erd.png "ERD")
+![Alt text] (/main_app/static/css/READMEpics/erd.png "ERD")
 
 ## Screenshots
 ### Home Page
-![Alt text] (/main_app/static/READMEpics/fitbuddyhome.png "home")
+![Alt text] (/main_app/static/css/READMEpics/fitbuddyhome.png "home")
 
 ### Map Page
-![Alt text] (/main_app/static/READMEpics/map.png "map")
+![Alt text] (/main_app/static/css/READMEpics/map.png "map")
 
 ## Add Exercise
-![Alt text] (/main_app/static/READMEpics/addexercise.png "addexercise")
+![Alt text] (/main_app/static/css/READMEpics/addexercise.png "addexercise")
 
 ## Exercise Database
-![Alt text] (/main_app/static/READMEpics/exercisedatabase.png "exercise database")
+![Alt text] (/main_app/static/css/READMEpics/exercisedatabase.png "exercise database")
 
 ## Exercise Database Detail
-![Alt text] (/main_app/static/READMEpics/exercisedatabase2.png "exercise database detail")
+![Alt text] (/main_app/static/css/READMEpics/exercisedatabase2.png "exercise database detail")
 
 ## My Workouts 
-![Alt text] (/main_app/static/READMEpics/myworkouts.png "My workouts")
+![Alt text] (/main_app/static/css/READMEpics/myworkouts.png "My workouts")
 
 ## Update Workouts
-![Alt text] (/main_app/static/READMEpics/updateworkout.png "Update workout")
+![Alt text] (/main_app/static/css/READMEpics/updateworkout.png "Update workout")
 
 ## Profile
-![Alt text] (/main_app/static/READMEpics/profile.png "Profile")
+![Alt text] (/main_app/static/css/READMEpics/profile.png "Profile")
 
 ## Update Profile
-![Alt text] (/main_app/static/READMEpics/updateprofile.png "update profile")
+![Alt text] (/main_app/static/css/READMEpics/updateprofile.png "update profile")
 
 # Challenges
 * Image upload, explored but couldn't get it to work
