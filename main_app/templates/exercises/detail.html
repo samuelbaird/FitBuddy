@@ -17,10 +17,8 @@
    <div class="card">
      <div class="card-image">
        <div class="carousel carousel-slider">
-        {% if exercise.photo %}
-           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="{{ exercise.photo.url }}"></a>
-        {%endif%}
-          </div>
+           <a class="carousel-item" href="#one!"><img style="height: 400px;" class="materialboxed" src="https://s3.us-west-1.amazonaws.com/fitbuddy-bucket{{ exercise.photo.url }}"></a>
+       </div>
      </div>
    </div>
  </div>
@@ -35,7 +33,7 @@
    </div>
  </div>
 </div>
-<div class="card-action yellow lighten-2">
+<div class="card-action">
    <a class="btn-large btn indigo" href="{% url 'user_exercises' %}">My Exercises</a>
  </div>
 
