@@ -1,6 +1,6 @@
 import uuid
 import boto3
-from botocore.exceptions import ClientError
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
@@ -171,7 +171,8 @@ def user_exercises(request):
 
 @login_required
 def exercises_detail(request, exercise_id):
-    exercise = ImportedExercise.objects.get(id=exercise_id)
+    exercise = get_object_or_404(ImportedExercise, id=exercise_id)
+
 
     formatted_primary_muscles = [
         muscle.strip("[]'").capitalize() for muscle in exercise.primaryMuscles.split(',')
@@ -199,30 +200,23 @@ class ExerciseCreate(CreateView):
     template_name = 'main_app/exercises_form.html'
 
     def form_valid(self, form):
-        # Set the current user and 'imported' flag
         form.instance.user = self.request.user
         form.instance.imported = False
 
-        # Generate a unique filename using uuid
-        unique_filename = f"{uuid.uuid4().hex}.jpg"
-
-        # Upload the file to AWS S3
         photo_file = self.request.FILES.get('photo')
         if photo_file:
+            unique_filename = f"{uuid.uuid4().hex}.jpg"
+
             s3_client = boto3.client('s3')
             s3_client.upload_fileobj(photo_file, 'fitbuddy-bucket', unique_filename)
             form.instance.photo = unique_filename
+        else:
+            form.instance.photo = None
 
         return super().form_valid(form)
 
     def get_success_url(self):
-        # Return the URL of the detail page for the newly created ImportedExercise
-        return reverse_lazy('detail', kwargs={'exercise_id': self.object.pk})  # Use 'exercise_id'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['importedexercises'] = ImportedExercise.objects.all()
-        return context
+        return reverse_lazy('detail', kwargs={'exercise_id': self.object.pk})
     
 def signup(request):
   error_message = ''
