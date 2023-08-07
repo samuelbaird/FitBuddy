@@ -36,67 +36,76 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
-        var map;
-        var markers = [];
-        var maxPoints = 20;
-        var routeLayer;
-        var centerMarker;
-        
+       // Global variables
+var map;
+var markers = [];
+var maxPoints = 20;
+var routeLayer;
+var centerMarker;
 
-        function initMap() {
-            map = L.map('map').setView([38.9072, -77.0369], 13);
-            map.zoomControl.setPosition('topright');
+// Function to initialize the map
+function initMap() {
+    // Map initialization code...
+    map = L.map('map').setView([38.9072, -77.0369], 13);
+    map.zoomControl.setPosition('topright');
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-            addCenterMarker();
-            setupEventListeners();
-            L.control.scale().addTo(map);
-            L.control.measure({ position: 'topleft', primaryLengthUnit: 'kilometers', secondaryLengthUnit: 'miles', primaryAreaUnit: undefined, secondaryAreaUnit: undefined }).addTo(map);
+    addCenterMarker();
+    setupEventListeners();
+    L.control.scale().addTo(map);
+    L.control.measure({ position: 'topleft', primaryLengthUnit: 'kilometers', secondaryLengthUnit: 'miles', primaryAreaUnit: undefined, secondaryAreaUnit: undefined }).addTo(map);
 
-            // Add click event listener to each marker to remove it when clicked
-            markers.forEach(marker => {
-                marker.on('click', () => {
-                    if (markers.length > 2) {
-                        map.removeLayer(marker);
-                        markers = markers.filter(m => m !== marker);
-                        drawRoute();
-                        updateAdditionalContent();
-                    }
-                });
-            });
-        }
+    // Add click event listener to each marker to remove it when clicked
+    markers.forEach(marker => {
+        marker.on('click', () => {
+            if (markers.length > 2) {
+                map.removeLayer(marker);
+                markers = markers.filter(m => m !== marker);
+                drawRoute();
+                updateDistance();
+            }
+        });
+    });
 
-        function addCenterMarker() {
-            centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
-                .bindPopup('Route Start')
-                .openPopup();
-            markers.push(centerMarker);
-        }
+    // Update the distance display initially
+    updateDistance();
+}
 
-        function setupEventListeners() {
-            map.on('click', onMapClick);
-        }
+// Function to add the center marker
+function addCenterMarker() {
+    centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
+        .bindPopup('Route Start')
+        .openPopup();
+    markers.push(centerMarker);
+}
 
-        function haversineDistance(latlng1, latlng2) {
-            const R = 6371e3; // Earth's radius in meters
-            const φ1 = latlng1.lat * Math.PI / 180;
-            const φ2 = latlng2.lat * Math.PI / 180;
-            const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
-            const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
-            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distance = R * c;
+// Function to setup event listeners
+function setupEventListeners() {
+    map.on('click', onMapClick);
+}
 
-            return distance;
-        }
+// Function to calculate the Haversine distance between two points
+function haversineDistance(latlng1, latlng2) {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = latlng1.lat * Math.PI / 180;
+    const φ2 = latlng2.lat * Math.PI / 180;
+    const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+    const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
 
-        function updateDistance() {
+    return distance;
+}
+
+// Function to update the distance display
+function updateDistance() {
     if (markers.length >= 2) {
         var totalDistanceMeters = 0;
         for (let i = 0; i < markers.length - 1; i++) {
@@ -120,46 +129,49 @@
     }
 }
 
-        function drawRoute() {
-            if (markers.length >= 2) {
-                if (routeLayer) {
-                    map.removeLayer(routeLayer);
-                }
-
-                var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Replace this with your Mapbox access token
-                var waypoints = markers.map(marker => marker.getLatLng());
-                var waypointsStr = waypoints.map(point => point.lng + ',' + point.lat).join(';');
-                var url = `https://api.mapbox.com/directions/v5/mapbox/driving/${waypointsStr}?geometries=geojson&access_token=${accessToken}`;
-
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        var route = data.routes[0].geometry;
-                        routeLayer = L.geoJSON(route, { color: 'blue' }).addTo(map);
-                        updateDistance();
-                    });
-            } else {
-                centerMarker.setPopupContent('Start route');
-                if (routeLayer) {
-                    map.removeLayer(routeLayer);
-                }
-                updateDistance();
-            }
+// Function to draw the route on the map
+function drawRoute() {
+    if (markers.length >= 2) {
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
         }
 
-        function onMapClick(e) {
+        var accessToken = 'pk.eyJ1IjoiY29yeWRlc21vbmQiLCJhIjoiY2xrd3dyZWpnMDFhbzNjbGh5Nnl3aG0wMiJ9.HtNomU3DJ-8ksPpjK9h5vQ'; // Replace this with your Mapbox access token
+        var waypoints = markers.map(marker => marker.getLatLng());
+        var waypointsStr = waypoints.map(point => point.lng + ',' + point.lat).join(';');
+        var url = `https://api.mapbox.com/directions/v5/mapbox/driving/${waypointsStr}?geometries=geojson&access_token=${accessToken}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                var route = data.routes[0].geometry;
+                routeLayer = L.geoJSON(route, { color: 'blue' }).addTo(map);
+                updateDistance();
+            });
+    } else {
+        centerMarker.setPopupContent('Start route');
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+        }
+        updateDistance();
+    }
+}
+
+// Function to handle map click event and add new markers
+function onMapClick(e) {
     if (markers.length < maxPoints) {
         var clickedCoordinates = e.latlng;
         var pointNumber = markers.length + 1; // Start numbering from 1
         var marker = L.marker(clickedCoordinates).addTo(map)
-            .bindPopup('Point ' + pointNumber + ': You stopped here '  )
+            .bindPopup('Point ' + pointNumber + ': You stopped here')
             .openPopup();
         markers.push(marker);
         drawRoute();
     }
 }
 
-        function setStartPoint() {
+// Function to set the starting point based on user-provided address
+function setStartPoint() {
     var address = document.getElementById('address').value;
     if (address !== '') {
         var geocoder = L.Control.Geocoder.nominatim();
@@ -190,8 +202,8 @@
     }
 }
 
-
-        function savePoints() {
+// Function to save the points and route in local storage
+function savePoints() {
     var savedRoutesStr = localStorage.getItem('savedRoutes');
     var savedRoutes = savedRoutesStr ? JSON.parse(savedRoutesStr) : [];
     var savedPoints = markers.map(marker => ({
@@ -208,8 +220,8 @@
     updateAdditionalContent();
 }
 
-
-        function loadPoints(index) {
+// Function to load a saved route from local storage
+function loadPoints(index) {
     var savedRoutesStr = localStorage.getItem('savedRoutes');
     if (savedRoutesStr) {
         var savedRoutes = JSON.parse(savedRoutesStr);
@@ -242,16 +254,13 @@
         // Find the bounding box of the route
         var routeBounds = L.latLngBounds(savedPoints.map(point => [point.lat, point.lng]));
 
-        // Pan the map to fit within the bounding box with a slightly more zoomed-out view
-        map.fitBounds(routeBounds, { padding: [50, 50], maxZoom: map.getZoom() - 1 });
+        // Pan the map to fit within the bounding box with a less zoomed-out view (maxZoom = 10)
+        map.fitBounds(routeBounds, { padding: [50, 50], maxZoom: 100 });
     }
 }
 
 
-
-
-
-
+// Function to update the additional content, like displaying saved routes
 function updateAdditionalContent() {
     var savedRoutesStr = localStorage.getItem('savedRoutes');
     if (savedRoutesStr) {
@@ -287,6 +296,7 @@ function updateAdditionalContent() {
     }
 }
 
+// Function to delete a saved route from local storage
 function deleteRoute(index) {
     var savedRoutesStr = localStorage.getItem('savedRoutes');
     if (savedRoutesStr) {
@@ -297,6 +307,8 @@ function deleteRoute(index) {
         updateAdditionalContent();
     }
 }
+
+// Function to display the saved routes on the map
 function displaySavedRoutes() {
     var savedRoutesStr = localStorage.getItem('savedRoutes');
     if (savedRoutesStr) {
@@ -313,11 +325,8 @@ function displaySavedRoutes() {
     }
 }
 
-
-
-
-
-        function clearMarkers(keepCenterMarker = false) {
+// Function to clear markers from the map
+function clearMarkers(keepCenterMarker = false) {
     if (!keepCenterMarker) {
         map.removeLayer(centerMarker);
         centerMarker = L.marker([38.9072, -77.0369]).addTo(map)
@@ -342,12 +351,15 @@ function displaySavedRoutes() {
     updateDistance();
 }
 
-        function deletePoints() {
-            clearMarkers(true); // Pass "true" to keep the center marker
-            drawRoute();
-        }
+// Function to delete the points from the map
+function deletePoints() {
+    clearMarkers(true); // Pass "true" to keep the center marker
+    drawRoute();
+}
 
-        initMap();
+// Initialize the map when the page loads
+initMap();
+
     </script>
     <div class="col s3" style="height: 400px; overflow-y: auto;">
         <div id="distance-info"></div>

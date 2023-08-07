@@ -23,11 +23,15 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var levelLabel = document.querySelector('label[for="{{ form.level.id_for_label }}"]');
+    var photoLabel = document.querySelector('label[for="{{ form.photo.id_for_label }}"]');
     var primaryMuscleLabel = document.querySelector('label[for="{{ form.primaryMuscles.id_for_label }}"]');
     var photoLabel = document.querySelector('label[for="{{ form.photo.id_for_label }}"]');
 
     if (levelLabel) {
       levelLabel.textContent = 'Difficulty:';
+    }
+    if (photoLabel) {
+      photoLabel.textContent = 'Upload Image:';
     }
 
     if (primaryMuscleLabel) {

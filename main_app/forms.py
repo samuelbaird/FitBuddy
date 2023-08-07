@@ -8,7 +8,6 @@ class ExerciseForm(forms.ModelForm):
         choices=DIFFICULTY,
         widget=forms.Select(attrs={'class':'browser-default'}),
     )
-
     primaryMuscles = forms.ChoiceField(
         choices=[(muscle, muscle) for muscle in set(ImportedExercise.objects.values_list('primaryMuscles', flat=True).distinct())],
         widget=forms.Select(attrs={'class':'browser-default'}),
