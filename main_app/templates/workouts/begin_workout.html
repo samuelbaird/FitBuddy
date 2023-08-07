@@ -9,29 +9,29 @@
     <div id="workout-exercises">
       {% if form.instance.pk %}
         {% for exercise_in_workout in form.instance.exerciseinworkout_set.all %}
-        <div class="card blue-grey darken-1">
-          <div class="card-content white-text">
-            <span class="card-title">{{ exercise_in_workout.exercise.name }}</span>
+        <div class="card">
+          <div class="card-content">
+            <h4>{{ exercise_in_workout.exercise.name }}</h4>
             <div class="row">
               <div class="col s2 input-field">
-                <input type="number" name="sets_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.sets }}" placeholder="Sets..." class="white-text"/>
-                <label>Sets</label>
+                <input type="number" name="sets_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.sets }}" placeholder="Sets"/>
+                <label for="sets">Sets</label>
               </div>
               <div class="col s2 input-field">
-                <input type="number" name="weight_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.weight }}" placeholder="Weight..." class="white-text"/>
-                <label>Weight</label>
+                <input type="number" name="weight_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.weight }}" placeholder="Weight"/>
+                <label for="weight">Weight</label>
               </div>
               <div class="col s2 input-field">
-                <input type="number" name="reps_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.reps }}" placeholder="Reps..." class="white-text"/>
-                <label>Reps</label>
+                <input type="number" name="reps_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.reps }}" placeholder="Reps"/>
+                <label for="reps">Reps</label>
               </div>
               <div class="col s2 input-field">
-                <input type="text" name="tempo_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.tempo }}" placeholder="Tempo..." class="white-text"/>
-                <label>Tempo</label>
+                <input type="text" name="tempo_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.tempo }}" placeholder="Tempo"/>
+                <label for="tempo">Tempo</label>
               </div>
               <div class="col s2 input-field">
-                <input type="number" name="rest_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.rest }}" placeholder="Rest time..." class="white-text"/>
-                <label>Rest Time</label>
+                <input type="number" name="rest_{{ exercise_in_workout.id }}" value="{{ exercise_in_workout.rest }}" placeholder="Rest time"/>
+                <label for="rest">Rest Time</label>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
         {% endfor %}
       {% endif %}
     </div>
-    <input type="submit" value="Submit" class="btn" />
+    <input type="submit" value="Submit" class="btn blue" />
   </form>
 </div>
 
