@@ -44,19 +44,33 @@ def map(request):
 
 @login_required
 def exercises_index(request):
-  all_exercises = ImportedExercise.objects.all()
-  categorized_exercises_dict = defaultdict(list)
+    all_imported_exercises = ImportedExercise.objects.all()
+    categorized_exercises_dict = defaultdict(list)
 
-  for exercise in all_exercises:
-      primary_muscles = exercise.primaryMuscles
-      categorized_exercises_dict[primary_muscles].append(exercise)
+    for exercise in all_imported_exercises:
+        primary_muscles = exercise.primaryMuscles
+        categorized_exercises_dict[primary_muscles].append(exercise)
 
-  categorized_exercises_dict = dict(categorized_exercises_dict)
+    categorized_exercises_dict = dict(categorized_exercises_dict)
 
+    # Get newly created exercises and add them to the context
+    newly_created_exercises = Exercise.objects.filter(user=request.user)
 
-  return render(request, 'exercises/exercises_index.html', {
-    'categorized_exercises_dict': categorized_exercises_dict
-  })
+    # Combine the importedexercises and newly created exercises in one list
+    all_exercises_list = list(all_imported_exercises) + list(newly_created_exercises)
+
+    # Create a new dictionary with primary muscles as keys and list of exercises as values
+    combined_exercises_dict = defaultdict(list)
+    for exercise in all_exercises_list:
+        primary_muscles = exercise.primaryMuscles
+        combined_exercises_dict[primary_muscles].append(exercise)
+
+    # Convert the dictionary to a regular dictionary
+    combined_exercises_dict = dict(combined_exercises_dict)
+
+    return render(request, 'exercises/exercises_index.html', {
+        'combined_exercises_dict': combined_exercises_dict,
+    })
 
 @login_required
 def muscle_index(request, muscle):
@@ -117,25 +131,21 @@ def user_exercises(request):
     user_exercises = Exercise.objects.filter(user=request.user)
     return render(request, 'user_exercises.html', {'user_exercises': user_exercises})
 
+class ExerciseCreate(CreateView):
+    model = Exercise
+    form_class = ExerciseForm
+    template_name = 'main_app/exercises_form.html'
+    success_url = '/exercises/'  # Update this to your desired success URL
 
-@login_required
-def exercises_form(request):
-  if request.method == 'POST':
-    form = ExerciseForm(request.POST)
-    if form.is_valid():
-      exercise = form.save(commit=False)
-      exercise.user = request.user  # Set the user before saving
-      exercise.save()
-      # form.save()
-      return redirect('user_exercises')
-    else:
-      return render(request, 'exercises_form.html', {'form': form})
-  else:
-      form = ExerciseForm()
-  return render(request, 'exercises_form.html', {'form': form})
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['importedexercises'] = ImportedExercise.objects.all()
+        return context
+    
 def signup(request):
   error_message = ''
   if request.method == 'POST':
@@ -352,8 +362,13 @@ def update_workout(request, pk):
 
 
 class ExerciseUpdate(UpdateView):
-  model = Exercise
-  fields = '__all__'
+    model = Exercise
+    form_class = ExerciseForm
+    template_name = 'main_app/exercises_form.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class ExerciseDelete(DeleteView):
   model = Exercise

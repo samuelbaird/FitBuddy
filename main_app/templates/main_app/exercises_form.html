@@ -1,46 +1,50 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-
 
 <div class="row">
   <div class="card">
     <div class="card-content">
-      
       {% if object %}
       <h1>Edit <span class="teal-text">{{object.name}}</span></h1>
       {% else %}
       <span class="card-title">Add Exercise</span>
       {% endif %} 
-      <form method="POST" action="">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" class="btn indigo pulse" value="New Exercise"/>
-      </form>
+        <form method="POST" action="">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" class="btn indigo pulse" value="New Exercise"/>
+        </form>
     </div>
   </div>
 </div>
 
 <script>
-
   document.addEventListener('DOMContentLoaded', function() {
-
     var levelLabel = document.querySelector('label[for="{{ form.level.id_for_label }}"]');
     var primaryMuscleLabel = document.querySelector('label[for="{{ form.primaryMuscles.id_for_label }}"]');
 
     if (levelLabel) {
-
       levelLabel.textContent = 'Difficulty:';
     }
 
     if (primaryMuscleLabel) {
-
       primaryMuscleLabel.textContent = 'Muscle:';
     }
-  });
 
-  const selectEl = document.getElementById('id_level');
-    M.FormSelect.init(selectEl);
+    const primaryMuscleEl = document.getElementById('id_primaryMuscles');
+    M.FormSelect.init(primaryMuscleEl);
+
+    for (const option of primaryMuscleEl.options) {
+      option.textContent = option.textContent.replace(/\[|\]/g, '');
+
+      // Remove quotation marks from the option text
+      option.textContent = option.textContent.replace(/['"]+/g, '');
+
+      // Capitalize the first letter of every word in the option text
+      option.textContent = option.textContent.replace(/\b\w/g, (match) => match.toUpperCase());
+    }
+  });
 </script>
-  {% endblock %}
-  
+
+{% endblock %}
