@@ -221,10 +221,8 @@ def workouts_detail(request, pk):
 
 def create_workout(request):
     if request.method == 'POST':
-        print(request.POST)
         form = WorkoutForm(request.POST)
         if form.is_valid():
-            print('form is valid')
             workout = form.save(commit=False)
             workout.is_template = True
 
