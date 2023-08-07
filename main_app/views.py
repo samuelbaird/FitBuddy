@@ -207,7 +207,7 @@ class ExerciseCreate(CreateView):
         if photo_file:
             unique_filename = f"{uuid.uuid4().hex}.jpg"
 
-            s3_client = boto3.client('S3')
+            s3_client = boto3.client('s3')
             s3_client.upload_fileobj(photo_file, 'fitbuddy-bucket', unique_filename)
             form.instance.photo = unique_filename
         else:
@@ -216,7 +216,7 @@ class ExerciseCreate(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('detail', kwargs={'exercise_id': self.object.pk})
     
 def signup(request):
   error_message = ''
