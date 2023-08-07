@@ -1,1 +1,1 @@
-web: gunicorn fitbuddy-app.wsgi
+web: gunicorn fitbuddy.wsgi
