@@ -5,8 +5,8 @@
 <h4 style="text-align: center;">Select a Muscle</h4>
 <div class="container">
   <div class="row">
-  {% for primary_muscle, exercises in categorized_exercises_dict.items %}
-  <a href="{% url 'muscle_exercise_index' primary_muscle|slice:"2:-2" %}">
+  {% for primary_muscle, exercises in combined_exercises_dict.items %}
+  <a href="{% url 'muscle_exercise_index' primary_muscle %}">
     <div class="col s4">
       <div class="card">
           <div class="card-action">
