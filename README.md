@@ -56,5 +56,20 @@
 ### Super Cool Codes
 *The haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes. Important in navigation, it is a special case of a more general formula in spherical trigonometry, the law of haversines, that relates the sides and angles of spherical triangles. AKA distance between two points in relation to the earth.
 
+function haversineDistance(latlng1, latlng2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = latlng1.lat * Math.PI / 180;
+            const φ2 = latlng2.lat * Math.PI / 180;
+            const Δφ = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+            const Δλ = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+
+            return distance;
+        }
+
 
 ![Alt text](/main_app/static/css/READMEpics/haversinedistance.png "haversine distance ")
