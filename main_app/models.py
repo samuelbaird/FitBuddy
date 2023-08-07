@@ -98,7 +98,7 @@ class ImportedExercise(models.Model):
     primaryMuscles = models.CharField(max_length=100, default='')
     secondaryMuscles = models.CharField(max_length=100, default='', null=True, blank=True)
     category = models.CharField(max_length=100, default='', null=True, blank=True)
-    images = models.CharField(max_length=100, default='')
+    images = models.CharField(max_length=100, default='', null=True, blank=True)
     instructions = models.CharField(max_length=1000, default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     imported = models.BooleanField(default=True)
