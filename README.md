@@ -1,10 +1,13 @@
-#Fitbuddy
+# Fitbuddy
 #### FitBuddy is a full stack application that promotes a healthier lifestyle! With 0Auth capability to ensure your data is all about you! Languages,framework and databases that were used:
 * Python
 * DjangoDB
 * JavaScript
 * HTML
 * CSS
+
+#### The FitBuddy mascot
+![Alt text](main_app/static/main_app/cursed-icon.jpg)
 
 #### Contributions from this amazing team made by Sam, Dennis, and Cory
 ## Trello Board
@@ -25,6 +28,8 @@
 
 ## Add Exercise
 ![Alt text](/main_app/static/css/READMEpics/addexercise.png "addexercise")
+
+
 
 ## Exercise Database
 ![Alt text](/main_app/static/css/READMEpics/exercisedatabase.png "exercise database")
