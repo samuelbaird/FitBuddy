@@ -1,4 +1,5 @@
 # Fitbuddy
+[Deployed Page](https://fitbuddy-app-b650cc5e2b80.herokuapp.com/)
 #### FitBuddy is a full stack application that promotes a healthier lifestyle! With 0Auth capability to ensure your data is all about you! Languages,framework and databases that were used:
 * Python
 * DjangoDB
