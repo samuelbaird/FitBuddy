@@ -16,17 +16,18 @@
 
 </style>
 <div class="row">
-    <div class="col s9" id="map-container">
-        <div id="map" style="height: 100%;"></div>
-    </div>
-    
-    <div class="col s3">
+    <div class="col s12">
         <div class="card" id="additional-content">
-            <!-- Add content for the additional div here -->
-            <h5>Plan a Route!</h5>
-            <p>Search an address in the input field and press Set Start Point to start planning your route! </p>
-            <p>After you save your daily route make sure to save and then you can check your progress of the routes you have saved!</p>
+            <div class="card-content">
+                <!-- Add content for the additional div here -->
+                <h5 style="text-align: center;">Plan a Route!</h5>
+                <p>Search an address in the input field and press Set Start Point to start planning your route! </p>
+                <p>After you save your daily route make sure to save and then you can check your progress of the routes you have saved!</p>
+            </div>
         </div>
+    </div>
+    <div class="col s12" id="map-container">
+        <div id="map" style="height: 100%;"></div>
     </div>
 </div>
 <div id="saved-routes"></div>
@@ -366,9 +367,10 @@ initMap();
         <input style="width: 74%;" type="text" id="address" placeholder="Enter an address">
         <br>
         <button class="waves-effect waves-light btn-small indigo button" onclick="setStartPoint()">Set Start Point</button>
+        <button class="waves-effect waves-light btn-small indigo button" onclick="deletePoints()">Delete Points</button>
+        <br><br>
         <button class="waves-effect waves-light btn-small indigo button" onclick="savePoints()">Save Points</button>
         <button class="waves-effect waves-light btn-small indigo button" onclick="loadPoints()">Load Points</button>
-        <button class="waves-effect waves-light btn-small indigo button" onclick="deletePoints()">Delete Points</button>
     </div>
 
 </div>
