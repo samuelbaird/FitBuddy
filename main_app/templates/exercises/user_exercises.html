@@ -27,7 +27,6 @@
 </ul>
 
 <script>
-  // Remove square brackets from the primaryMuscles field
   document.addEventListener('DOMContentLoaded', function() {
     for (let i = 1; i <= {{ user_exercises|length }}; i++) {
       const primaryMusclesEl = document.getElementById('primaryMuscles' + i);
