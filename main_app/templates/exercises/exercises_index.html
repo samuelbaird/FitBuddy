@@ -7,7 +7,7 @@
   <div class="row">
   {% for primary_muscle, exercises in combined_exercises_dict.items %}
   <a href="{% url 'muscle_exercise_index' primary_muscle %}">
-    <div class="col s4">
+    <div class="col s6 m4">
       <div class="card">
           <div class="card-action">
               <p>{{ primary_muscle|slice:"2:-2"|upper}}</p>
